@@ -1,0 +1,26 @@
+{% extends "accounts/profile_base.html" %}
+{% block title %}Company Profile | Jobs Platform{% endblock %}
+{% block profile_content %}
+<h2>Company Profile</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ profile.company_name }}</h5>
+        <p class="card-text"><strong>Contact Email:</strong> {{ user.email }}</p>
+        <p class="card-text"><strong>Website:</strong> <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>
+        <p class="card-text"><strong>Description:</strong> {{ profile.description }}</p>
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+    </div>
+</div>
+<h3>Active Job Postings</h3>
+<ul class="list-group">
+    {% for job in active_jobs %}
+        <li class="list-group-item">
+            <a href="{% url 'jobs:job_detail' job.id %}">{{ job.title }}</a>
+            <span class="badge bg-success">{{ job.status }}</span>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">No active jobs.</li>
+    {% endfor %}
+</ul>
+<h3>Total Applications: {{ total_applications }}</h3>
+{% endblock %}

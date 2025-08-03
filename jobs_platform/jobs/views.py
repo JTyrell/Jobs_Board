@@ -110,7 +110,7 @@ class JobDetailView(DetailView):
     context_object_name = 'job'
     
     def get_queryset(self):
-        return super().get_queryset().select_related('employer', 'category', 'industry')
+        return super().get_queryset().select_related('employer', 'category')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

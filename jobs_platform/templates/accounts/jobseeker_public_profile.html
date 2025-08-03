@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ jobseeker.get_full_name }} | Jobseeker Profile{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ jobseeker.get_full_name }}</h2>
+                    <p><strong>Username:</strong> {{ jobseeker.user.username }}</p>
+                    <p><strong>Bio:</strong> {{ jobseeker.bio }}</p>
+                    <p><strong>Skills:</strong> {{ jobseeker.skills }}</p>
+                    {% if jobseeker.resume %}
+                        <p><strong>Resume:</strong> <a href="{{ jobseeker.resume.url }}" target="_blank">Download Resume</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

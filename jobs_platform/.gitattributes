@@ -1,0 +1,459 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files
+*.py text diff=python
+
+# Django templates
+*.html text
+*.htm text
+
+# CSS files
+*.css text
+
+# JavaScript files
+*.js text
+
+# JSON files
+*.json text
+
+# Markdown files
+*.md text diff=markdown
+
+# YAML files
+*.yml text
+*.yaml text
+
+# Configuration files
+*.conf text
+*.cfg text
+*.ini text
+*.toml text
+
+# Documentation
+*.txt text
+*.rst text
+
+# Requirements files
+requirements*.txt text
+
+# Git configuration
+.gitattributes text
+.gitignore text
+.gitmessage text
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# SQL files
+*.sql text
+
+# Environment files
+.env* text
+
+# Docker files
+Dockerfile text
+docker-compose*.yml text
+*.dockerfile text
+
+# Binary files (should not be modified)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.rar binary
+*.7z binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.db binary
+*.sqlite3 binary
+
+# Media files
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wmv binary
+*.flv binary
+*.webm binary
+*.mp3 binary
+*.wav binary
+*.flac binary
+*.ogg binary
+
+# Font files
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Archive files
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.xz binary
+
+# Executable files
+*.exe binary
+*.msi binary
+*.deb binary
+*.rpm binary
+*.dmg binary
+*.pkg binary
+
+# Database files
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Log files
+*.log text
+
+# Temporary files
+*.tmp text
+*.temp text
+*.bak text
+*.backup text
+
+# IDE files
+.vscode/settings.json text
+.idea/workspace.xml text
+
+# OS generated files
+.DS_Store binary
+Thumbs.db binary
+
+# Certificate files
+*.pem text
+*.key text
+*.crt text
+*.csr text
+
+# SSH keys
+*.pub text
+id_rsa text
+id_ed25519 text
+
+# Terraform files
+*.tf text
+*.tfvars text
+*.hcl text
+
+# Kubernetes files
+*.yaml text
+*.yml text
+
+# Helm charts
+Chart.yaml text
+values.yaml text
+
+# Ansible files
+*.ansible text
+*.playbook text
+
+# Vagrant files
+Vagrantfile text
+
+# Docker ignore
+.dockerignore text
+
+# Nginx configuration
+nginx.conf text
+*.nginx text
+
+# Apache configuration
+httpd.conf text
+*.apache text
+
+# SSL certificates
+*.pem text
+*.key text
+*.crt text
+*.csr text
+
+# Backup files
+*.bak text
+*.backup text
+*.old text
+
+# Lock files
+*.lock text
+Pipfile.lock text
+package-lock.json text
+yarn.lock text
+
+# Cache files
+*.cache text
+.cache/* text
+
+# Coverage files
+.coverage text
+coverage.xml text
+htmlcov/* text
+
+# Test files
+*.test text
+*_test.py text
+test_*.py text
+
+# Migration files
+*/migrations/*.py text
+
+# Settings files
+settings.py text
+local_settings.py text
+production.py text
+development.py text
+
+# URL configuration
+urls.py text
+
+# Forms
+forms.py text
+
+# Models
+models.py text
+
+# Views
+views.py text
+
+# Admin
+admin.py text
+
+# Apps
+apps.py text
+
+# Tests
+tests.py text
+
+# Management commands
+*/management/commands/*.py text
+
+# Static files
+static/**/*.css text
+static/**/*.js text
+static/**/*.html text
+static/**/*.txt text
+
+# Template files
+templates/**/*.html text
+templates/**/*.txt text
+
+# Media files (text-based)
+media/**/*.txt text
+media/**/*.md text
+media/**/*.json text
+
+# Documentation
+docs/**/*.md text
+docs/**/*.rst text
+docs/**/*.txt text
+
+# README files
+README* text
+readme* text
+
+# License files
+LICENSE* text
+license* text
+
+# Contributing files
+CONTRIBUTING* text
+contributing* text
+
+# Changelog files
+CHANGELOG* text
+changelog* text
+
+# Release notes
+RELEASE* text
+release* text
+
+# Code of conduct
+CODE_OF_CONDUCT* text
+code_of_conduct* text
+
+# Security policy
+SECURITY* text
+security* text
+
+# Issue templates
+.github/ISSUE_TEMPLATE/*.md text
+.github/ISSUE_TEMPLATE/*.yml text
+
+# Pull request templates
+.github/PULL_REQUEST_TEMPLATE.md text
+
+# GitHub workflows
+.github/workflows/*.yml text
+.github/workflows/*.yaml text
+
+# GitHub actions
+.github/actions/*/action.yml text
+
+# Dependabot configuration
+.github/dependabot.yml text
+
+# GitHub configuration
+.github/config.yml text
+
+# GitHub settings
+.github/settings.yml text
+
+# GitHub pages
+.github/pages.yml text
+
+# GitHub sponsors
+.github/sponsors.yml text
+
+# GitHub funding
+.github/FUNDING.yml text
+
+# GitHub discussions
+.github/discussions.yml text
+
+# GitHub community health
+.github/community-health.yml text
+
+# GitHub repository settings
+.github/repository-settings.yml text
+
+# GitHub repository rules
+.github/repository-rules.yml text
+
+# GitHub repository permissions
+.github/repository-permissions.yml text
+
+# GitHub repository secrets
+.github/repository-secrets.yml text
+
+# GitHub repository variables
+.github/repository-variables.yml text
+
+# GitHub repository environments
+.github/environments/*.yml text
+
+# GitHub repository deployments
+.github/deployments/*.yml text
+
+# GitHub repository releases
+.github/releases/*.yml text
+
+# GitHub repository packages
+.github/packages/*.yml text
+
+# GitHub repository codespaces
+.github/codespaces/*.yml text
+
+# GitHub repository projects
+.github/projects/*.yml text
+
+# GitHub repository wikis
+.github/wikis/*.md text
+
+# GitHub repository discussions
+.github/discussions/*.md text
+
+# GitHub repository issues
+.github/issues/*.md text
+
+# GitHub repository pull requests
+.github/pull-requests/*.md text
+
+# GitHub repository commits
+.github/commits/*.md text
+
+# GitHub repository branches
+.github/branches/*.md text
+
+# GitHub repository tags
+.github/tags/*.md text
+
+# GitHub repository releases
+.github/releases/*.md text
+
+# GitHub repository packages
+.github/packages/*.md text
+
+# GitHub repository codespaces
+.github/codespaces/*.md text
+
+# GitHub repository projects
+.github/projects/*.md text
+
+# GitHub repository wikis
+.github/wikis/*.txt text
+
+# GitHub repository discussions
+.github/discussions/*.txt text
+
+# GitHub repository issues
+.github/issues/*.txt text
+
+# GitHub repository pull requests
+.github/pull-requests/*.txt text
+
+# GitHub repository commits
+.github/commits/*.txt text
+
+# GitHub repository branches
+.github/branches/*.txt text
+
+# GitHub repository tags
+.github/tags/*.txt text
+
+# GitHub repository releases
+.github/releases/*.txt text
+
+# GitHub repository packages
+.github/packages/*.txt text
+
+# GitHub repository codespaces
+.github/codespaces/*.txt text
+
+# GitHub repository projects
+.github/projects/*.txt text
+
+# GitHub repository wikis
+.github/wikis/*.rst text
+
+# GitHub repository discussions
+.github/discussions/*.rst text
+
+# GitHub repository issues
+.github/issues/*.rst text
+
+# GitHub repository pull requests
+.github/pull-requests/*.rst text
+
+# GitHub repository commits
+.github/commits/*.rst text
+
+# GitHub repository branches
+.github/branches/*.rst text
+
+# GitHub repository tags
+.github/tags/*.rst text
+
+# GitHub repository releases
+.github/releases/*.rst text
+
+# GitHub repository packages
+.github/packages/*.rst text
+
+# GitHub repository codespaces
+.github/codespaces/*.rst text
+
+# GitHub repository projects
+.github/projects/*.rst text 

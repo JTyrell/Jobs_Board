@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'crispy_bootstrap5',
     'rest_framework',
     
     # Local apps
@@ -146,4 +147,4 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Crispy Forms
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'crispy_bootstrap5'

@@ -33,7 +33,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             context['active_jobs'] = Job.objects.filter(
                 employer=user.employer_profile, 
                 status='published'
-            ).count()
+            )
             context['total_applications'] = JobApplication.objects.filter(
                 job__employer=user.employer_profile
             ).count()
@@ -95,26 +95,26 @@ class JobSeekerDashboardView(LoginRequiredMixin, TemplateView):
             
         # Recent applications
         context['recent_applications'] = JobApplication.objects.filter(
-            applicant=user
-        ).select_related('job', 'job__employer').order_by('-created_at')[:5]
+            applicant=user.jobseeker_profile
+        ).select_related('job', 'job__employer').order_by('-applied_at')[:5]
         
         # Saved jobs
         context['saved_jobs'] = SavedJob.objects.filter(
             user=user
-        ).select_related('job', 'job__employer').order_by('-created_at')[:5]
+        ).select_related('job', 'job__employer').order_by('-saved_at')[:5]
         
         # Application stats
-        context['total_applications'] = JobApplication.objects.filter(applicant=user).count()
-        context['pending_applications'] = JobApplication.objects.filter(applicant=user, status='pending').count()
-        context['viewed_applications'] = JobApplication.objects.filter(applicant=user, status='viewed').count()
-        context['interviewing_applications'] = JobApplication.objects.filter(applicant=user, status='interviewing').count()
-        context['accepted_applications'] = JobApplication.objects.filter(applicant=user, status='accepted').count()
-        context['rejected_applications'] = JobApplication.objects.filter(applicant=user, status='rejected').count()
+        context['total_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile).count()
+        context['pending_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile, status='pending').count()
+        context['viewed_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile, status='viewed').count()
+        context['interviewing_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile, status='interviewing').count()
+        context['accepted_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile, status='accepted').count()
+        context['rejected_applications'] = JobApplication.objects.filter(applicant=user.jobseeker_profile, status='rejected').count()
         
         # Recommended jobs based on profile and previous applications
         # This is a simple recommendation based on job categories from previous applications
         applied_categories = JobApplication.objects.filter(
-            applicant=user
+            applicant=user.jobseeker_profile
         ).values_list('job__category', flat=True).distinct()
         
         if applied_categories:
@@ -122,7 +122,7 @@ class JobSeekerDashboardView(LoginRequiredMixin, TemplateView):
                 status='published',
                 category__in=applied_categories
             ).exclude(
-                id__in=JobApplication.objects.filter(applicant=user).values_list('job_id', flat=True)
+                id__in=JobApplication.objects.filter(applicant=user.jobseeker_profile).values_list('job_id', flat=True)
             ).select_related('employer').order_by('-created_at')[:5]
         else:
             context['recommended_jobs'] = Job.objects.filter(
@@ -160,7 +160,7 @@ class EmployerDashboardView(LoginRequiredMixin, TemplateView):
         # Recent applications to their jobs
         context['recent_applications'] = JobApplication.objects.filter(
             job__employer=user.employer_profile
-        ).select_related('job', 'applicant').order_by('-created_at')[:10]
+        ).select_related('job', 'applicant').order_by('-applied_at')[:10]
         
         # Stats
         context['total_jobs'] = Job.objects.filter(employer=user.employer_profile).count()

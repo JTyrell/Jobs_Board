@@ -1,0 +1,126 @@
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+
+# Types:
+#   feat     (new feature for the user, not a new feature for build script)
+#   fix      (bug fix for the user, not a fix to a build script)
+#   docs     (changes to the documentation)
+#   style    (formatting, missing semi colons, etc; no production code change)
+#   refactor (refactoring production code, eg. renaming a variable)
+#   test     (adding missing tests, refactoring tests; no production code change)
+#   chore    (updating grunt tasks etc; no production code change)
+#   perf     (performance improvements)
+#   ci       (CI/CD related changes)
+#   build    (build system or external dependencies)
+#   revert   (revert a previous commit)
+
+# Scopes:
+#   crm      (CRM functionality)
+#   jobs     (job board functionality)
+#   accounts (user management)
+#   core     (core platform features)
+#   api      (API endpoints)
+#   ui       (user interface)
+#   auth     (authentication)
+#   test     (testing)
+#   docs     (documentation)
+#   deps     (dependencies)
+#   config   (configuration)
+
+# Examples:
+# feat(crm): add messaging system between employers and job seekers
+# fix(jobs): resolve job search filter not working with multiple categories
+# docs(api): update API documentation for new endpoints
+# style(ui): format code according to style guide
+# refactor(accounts): simplify user profile update logic
+# test(crm): add comprehensive tests for notification system
+# chore(deps): update Django to version 4.2.7
+# perf(jobs): optimize job search query performance
+# ci(build): add automated testing pipeline
+# build(deps): add new dependencies for payment processing
+# revert(jobs): revert job application status change
+
+# Rules:
+# 1. Use the present tense ("add feature" not "added feature")
+# 2. Use the imperative mood ("move cursor to..." not "moves cursor to...")
+# 3. Limit the first line to 72 characters or less
+# 4. Reference issues and pull requests liberally after the first line
+# 5. Consider starting the commit message with an applicable emoji:
+#    🚀 :rocket: when introducing new features
+#    🐛 :bug: when fixing a bug
+#    📝 :memo: when adding or updating documentation
+#    🎨 :art: when improving the format/structure of the code
+#    ♻️  :recycle: when refactoring code
+#    ⚡️ :zap: when improving performance
+#    🔧 :wrench: when fixing build process or auxiliary tools
+#    🌐 :globe_with_meridians: when dealing with globalization/internationalization
+#    ✨ :sparkles: when introducing UI improvements
+#    🔒 :lock: when dealing with security
+#    🚧 :construction: when work in progress
+#    📦 :package: when adding or updating compiled files or packages
+#    👽 :alien: when updating code due to external API changes
+#    🚚 :truck: when moving or renaming files
+#    📈 :chart_with_upwards_trend: when adding or updating analytics
+#    🍱 :bento: when adding or updating assets
+#    ♿️ :wheelchair: when improving accessibility
+#    💄 :lipstick: when adding or updating the UI and style files
+#    🍻 :beers: when writing code drunkenly
+#    💬 :speech_balloon: when updating text and literals
+#    🃏 :black_joker: when adding or updating a game
+#    🎬 :clapper: when adding or updating video files
+#    🔍 :mag: when improving SEO
+#    🏁 :checkered_flag: when adding or updating a game
+#    🐧 :penguin: when fixing something on Linux
+#    🍎 :apple: when fixing something on macOS
+#    🏠 :house: when working on something related to home
+#    🔖 :bookmark: when releasing / Version tags
+#    🏗️  :building_construction: when making architectural changes
+#    📱 :iphone: when working on responsive design
+#    🤖 :robot: when fixing artificial intelligence
+#    🎯 :dart: when improving accuracy
+#    🧪 :test_tube: when adding a failing test
+#    💚 :green_heart: when fixing the CI build
+#    ⬇️  :arrow_down: when downgrading dependencies
+#    ⬆️  :arrow_up: when upgrading dependencies
+#    👕 :shirt: when removing linter warnings
+#    🥅 :goal_net: when catching errors
+#    🔀 :twisted_rightwards_arrows: when merging branches
+#    📋 :clipboard: when adding or updating a license
+#    🔥 :fire: when removing code or files
+#    🚨 :rotating_light: when removing linter warnings
+#    🎉 :tada: when initial commit
+#    ✅ :white_check_mark: when adding tests
+#    🔒 :lock: when fixing security issues
+#    ☀️ :sunny: when fixing something related to Android
+#    🌙 :new_moon: when fixing something related to iOS
+#    ⚡️ :zap: when introducing breaking changes
+#    🐳 :whale: when fixing Docker
+#    🐘 :elephant: when fixing PostgreSQL
+#    🐬 :dolphin: when fixing MySQL
+#    🍃 :leaves: when fixing MongoDB
+#    🐪 :camel: when fixing Perl
+#    🐍 :snake: when fixing Python
+#    🐸 :frog: when fixing Go
+#    🐙 :octopus: when fixing Git
+#    🐛 :bug: when fixing a bug
+#    🐞 :beetle: when fixing a bug
+#    🐜 :ant: when fixing a bug
+#    🕷️ :spider: when fixing a bug
+#    🕸️ :spider_web: when fixing a bug
+#    🦂 :scorpion: when fixing a bug
+#    🦗 :cricket: when fixing a bug
+#    🐌 :snail: when fixing performance issues
+#    🦋 :butterfly: when refactoring code
+#    🐛 :bug: when fixing a bug
+#    🐜 :ant: when fixing a bug
+#    🐝 :honeybee: when fixing a bug
+#    🐞 :beetle: when fixing a bug
+#    🦗 :cricket: when fixing a bug
+#    🕷️ :spider: when fixing a bug
+#    🕸️ :spider_web: when fixing a bug
+#    🦂 :scorpion: when fixing a bug
+#    🐌 :snail: when fixing performance issues
+#    🦋 :butterfly: when refactoring code 

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Seeker Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Job Seeker Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_applications }}</h4>
+                        <p class="mb-0">Total Applications</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ applications_this_month }}</h4>
+                        <p class="mb-0">This Month</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-calendar fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ saved_jobs.count }}</h4>
+                        <p class="mb-0">Saved Jobs</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-bookmark fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ recommended_jobs.count }}</h4>
+                        <p class="mb-0">Recommended</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-thumbs-up fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Applications</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_applications %}
+                    {% for application in recent_applications %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>{{ application.job.title }}</strong><br>
+                            <small class="text-muted">{{ application.job.company.company_name }}</small>
+                        </div>
+                        <span class="badge bg-{{ application.status|default:'secondary' }}">
+                            {{ application.get_status_display }}
+                        </span>
+                    </div>
+                    <hr>
+                    {% endfor %}
+                    <a href="{% url 'jobs_app:application_list' %}" class="btn btn-sm btn-primary">View All</a>
+                {% else %}
+                    <p class="text-muted">No applications yet. <a href="{% url 'jobs_app:job_list' %}">Browse jobs</a> to get started!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recommended Jobs</h5>
+            </div>
+            <div class="card-body">
+                {% if recommended_jobs %}
+                    {% for job in recommended_jobs %}
+                    <div class="mb-3">
+                        <strong>{{ job.title }}</strong><br>
+                        <small class="text-muted">{{ job.company.company_name }} - {{ job.location }}</small><br>
+                        <a href="{% url 'jobs_app:job_detail' job.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No recommendations available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

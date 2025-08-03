@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Jobs Platform - Find Your Dream Job{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-primary text-white rounded p-5 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <h1 class="display-4">Find Your Dream Job</h1>
+                <p class="lead">Search thousands of jobs from top companies and get hired today.</p>
+                <hr class="my-4">
+                <form action="{% url 'jobs:job_search' %}" method="get" class="mt-4">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control form-control-lg" name="q" placeholder="Job title, keywords">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control form-control-lg" name="location" placeholder="Location">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-light btn-lg w-100">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-5 d-none d-md-block">
+                <img src="/static/images/job-search.svg" alt="Job Search" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="featured-jobs mb-5">
+    <h2 class="section-title">Featured Jobs</h2>
+    <div class="row">
+        {% if featured_jobs %}
+            {% for job in featured_jobs %}
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100 job-card">
+                        <div class="card-body">
+                            {% if job.employer.company_logo %}
+                                <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="company-logo mb-3">
+                            {% else %}
+                                <div class="company-placeholder mb-3">{{ job.employer.company_name|slice:":1" }}</div>
+                            {% endif %}
+                            <h5 class="card-title">{{ job.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ job.employer.company_name }}</h6>
+                            <p class="card-text location">
+                                <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                                {% if job.remote_option %}
+                                    <span class="badge bg-info">Remote</span>
+                                {% endif %}
+                            </p>
+                            <p class="card-text job-type">
+                                <span class="badge bg-secondary">{{ job.get_job_type_display }}</span>
+                                <span class="badge bg-secondary">{{ job.get_experience_level_display }}</span>
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Posted {{ job.created_at|timesince }} ago</small>
+                            <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-sm btn-outline-primary">View Job</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">No featured jobs available at the moment.</div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">View All Jobs</a>
+    </div>
+</section>
+
+<section class="job-categories mb-5">
+    <h2 class="section-title">Popular Job Categories</h2>
+    <div class="row">
+        {% for category in job_categories %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 category-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text text-muted">{{ category.jobs.count }} Jobs Available</p>
+                    </div>
+                    <div class="card-footer bg-transparent text-center">
+                        <a href="{% url 'jobs:job_search' %}?category={{ category.id }}" class="stretched-link">Browse Jobs</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="how-it-works bg-light p-5 rounded mb-5">
+    <h2 class="section-title text-center mb-5">How It Works</h2>
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="process-step">
+                <div class="step-icon">
+                    <i class="fas fa-user-plus fa-3x text-primary"></i>
+                </div>
+                <h4>Create an Account</h4>
+                <p>Sign up as a job seeker or employer and complete your profile.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="process-step">
+                <div class="step-icon">
+                    <i class="fas fa-search fa-3x text-primary"></i>
+                </div>
+                <h4>Search Jobs</h4>
+                <p>Browse thousands of job listings or post your job opening.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="process-step">
+                <div class="step-icon">
+                    <i class="fas fa-check-circle fa-3x text-primary"></i>
+                </div>
+                <h4>Apply or Hire</h4>
+                <p>Apply to jobs with your profile or find the perfect candidate.</p>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'account_signup' %}" class="btn btn-primary">Get Started Today</a>
+    </div>
+</section>
+
+{% if testimonials %}
+<section class="testimonials mb-5">
+    <h2 class="section-title">What People Say</h2>
+    <div class="row">
+        {% for testimonial in testimonials %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            {% if testimonial.image %}
+                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="testimonial-img rounded-circle me-3">
+                            {% else %}
+                                <div class="testimonial-placeholder rounded-circle me-3">{{ testimonial.name|slice:":1" }}</div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-0">{{ testimonial.name }}</h5>
+                                <p class="text-muted mb-0">{{ testimonial.position }}{% if testimonial.company %}, {{ testimonial.company }}{% endif %}</p>
+                            </div>
+                        </div>
+                        <blockquote class="mb-0">
+                            <p>"{{ testimonial.quote }}"</p>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="cta-section bg-primary text-white p-5 rounded text-center">
+    <h2>Ready to Take the Next Step in Your Career?</h2>
+    <p class="lead">Join thousands of job seekers and employers on our platform.</p>
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'account_signup' %}?user_type=jobseeker" class="btn btn-light btn-lg mx-2">Job Seeker Sign Up</a>
+        <a href="{% url 'account_signup' %}?user_type=employer" class="btn btn-outline-light btn-lg mx-2">Employer Sign Up</a>
+    </div>
+</section>
+{% endblock %}

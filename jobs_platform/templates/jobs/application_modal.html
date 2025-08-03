@@ -1,0 +1,343 @@
+<!-- Application Details Modal -->
+<div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="applicationModalLabel">Application Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center p-5" id="application-loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading application details...</p>
+                </div>
+                <div id="application-content" style="display: none;">
+                    <div class="mb-4">
+                        <h5>Job Details</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="mb-1"><span id="job-title"></span></h6>
+                                <p class="mb-1 text-muted" id="company-name"></p>
+                                <p class="mb-0 small"><span id="job-location"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Applicant Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">First Name</label>
+                                <p class="mb-0 fw-medium" id="applicant-first-name"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Last Name</label>
+                                <p class="mb-0 fw-medium" id="applicant-last-name"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Email</label>
+                                <p class="mb-0" id="applicant-email"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Phone</label>
+                                <p class="mb-0" id="applicant-phone"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Resume & Cover Letter</h5>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Resume</label>
+                            <div id="resume-container"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Cover Letter</label>
+                            <div class="card">
+                                <div class="card-body bg-light" id="cover-letter"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4" id="additional-info-section">
+                        <h5>Additional Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">LinkedIn Profile</label>
+                                <p class="mb-0" id="linkedin-profile"></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Portfolio/Website</label>
+                                <p class="mb-0" id="portfolio-url"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4" id="custom-questions-section" style="display: none;">
+                        <h5>Additional Questions</h5>
+                        <div id="custom-answers"></div>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <label class="form-label text-muted">Application Date</label>
+                        <p class="mb-0" id="application-date"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="dropdown" id="status-dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Update Status
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item modal-status-option" href="#" data-status="pending">Pending</a></li>
+                        <li><a class="dropdown-item modal-status-option" href="#" data-status="viewed">Viewed</a></li>
+                        <li><a class="dropdown-item modal-status-option" href="#" data-status="interviewing">Interviewing</a></li>
+                        <li><a class="dropdown-item modal-status-option" href="#" data-status="accepted">Accepted</a></li>
+                        <li><a class="dropdown-item modal-status-option" href="#" data-status="rejected">Rejected</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle status dropdown changes
+    const statusDropdowns = document.querySelectorAll('.status-dropdown');
+    statusDropdowns.forEach(dropdown => {
+        const statusBtn = dropdown.querySelector('.status-btn');
+        const statusOptions = dropdown.querySelectorAll('.status-option');
+        
+        statusOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const applicationId = statusBtn.dataset.applicationId;
+                const newStatus = this.dataset.status;
+                
+                updateApplicationStatus(applicationId, newStatus, statusBtn);
+            });
+        });
+    });
+    
+    // Handle view application modal
+    const viewButtons = document.querySelectorAll('.view-application');
+    const applicationLoading = document.getElementById('application-loading');
+    const applicationContent = document.getElementById('application-content');
+    const customQuestionsSection = document.getElementById('custom-questions-section');
+    const modalStatusOptions = document.querySelectorAll('.modal-status-option');
+    
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const applicationId = this.dataset.applicationId;
+            
+            // Show loading, hide content
+            applicationLoading.style.display = 'block';
+            applicationContent.style.display = 'none';
+            customQuestionsSection.style.display = 'none';
+            
+            // Fetch application details
+            fetch(`/jobs/applications/${applicationId}/details/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const app = data.application;
+                        
+                        // Populate job details
+                        document.getElementById('job-title').textContent = app.job.title;
+                        document.getElementById('company-name').textContent = app.job.employer.company_name;
+                        document.getElementById('job-location').textContent = app.job.location;
+                        
+                        // Populate applicant details
+                        document.getElementById('applicant-first-name').textContent = app.first_name;
+                        document.getElementById('applicant-last-name').textContent = app.last_name;
+                        document.getElementById('applicant-email').textContent = app.email;
+                        document.getElementById('applicant-phone').textContent = app.phone;
+                        
+                        // Resume
+                        const resumeContainer = document.getElementById('resume-container');
+                        if (app.resume_url) {
+                            resumeContainer.innerHTML = `
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0">Resume</p>
+                                    </div>
+                                    <a href="${app.resume_url}" class="btn btn-outline-primary" target="_blank">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </a>
+                                </div>
+                            `;
+                        } else {
+                            resumeContainer.innerHTML = `<p class="text-muted">No resume provided</p>`;
+                        }
+                        
+                        // Cover letter
+                        const coverLetterEl = document.getElementById('cover-letter');
+                        if (app.cover_letter) {
+                            coverLetterEl.textContent = app.cover_letter;
+                        } else {
+                            coverLetterEl.innerHTML = `<p class="text-muted">No cover letter provided</p>`;
+                        }
+                        
+                        // Additional info
+                        const linkedinEl = document.getElementById('linkedin-profile');
+                        if (app.linkedin_profile) {
+                            linkedinEl.innerHTML = `<a href="${app.linkedin_profile}" target="_blank">${app.linkedin_profile}</a>`;
+                        } else {
+                            linkedinEl.textContent = 'Not provided';
+                        }
+                        
+                        const portfolioEl = document.getElementById('portfolio-url');
+                        if (app.portfolio_url) {
+                            portfolioEl.innerHTML = `<a href="${app.portfolio_url}" target="_blank">${app.portfolio_url}</a>`;
+                        } else {
+                            portfolioEl.textContent = 'Not provided';
+                        }
+                        
+                        // Custom answers
+                        const customAnswersEl = document.getElementById('custom-answers');
+                        if (app.custom_answers && Object.keys(app.custom_answers).length > 0) {
+                            let answersHtml = '';
+                            for (const [question, answer] of Object.entries(app.custom_answers)) {
+                                answersHtml += `
+                                    <div class="mb-3">
+                                        <label class="form-label fw-medium">${question}</label>
+                                        <div class="card">
+                                            <div class="card-body bg-light">${answer}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            customAnswersEl.innerHTML = answersHtml;
+                            customQuestionsSection.style.display = 'block';
+                        }
+                        
+                        // Application date
+                        document.getElementById('application-date').textContent = app.created_at;
+                        
+                        // Update modal status button data
+                        modalStatusOptions.forEach(option => {
+                            option.dataset.applicationId = applicationId;
+                        });
+                        
+                        // Hide loading, show content
+                        applicationLoading.style.display = 'none';
+                        applicationContent.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    applicationLoading.innerHTML = `
+                        <div class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                            <p>Error loading application details. Please try again.</p>
+                        </div>
+                    `;
+                });
+        });
+    });
+    
+    // Handle modal status options
+    if (modalStatusOptions) {
+        modalStatusOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const applicationId = this.dataset.applicationId;
+                const newStatus = this.dataset.status;
+                
+                // Find the status button for this application in the table
+                const statusBtn = document.querySelector(`.status-btn[data-application-id="${applicationId}"]`);
+                
+                updateApplicationStatus(applicationId, newStatus, statusBtn);
+            });
+        });
+    }
+    
+    // Function to update application status
+    function updateApplicationStatus(applicationId, newStatus, statusBtn) {
+        fetch(`/jobs/applications/${applicationId}/status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update button class and text
+                statusBtn.className = 'btn btn-sm status-btn dropdown-toggle';
+                if (newStatus === 'pending') {
+                    statusBtn.classList.add('btn-warning', 'text-dark');
+                    statusBtn.textContent = 'Pending';
+                } else if (newStatus === 'viewed') {
+                    statusBtn.classList.add('btn-info', 'text-white');
+                    statusBtn.textContent = 'Viewed';
+                } else if (newStatus === 'interviewing') {
+                    statusBtn.classList.add('btn-primary');
+                    statusBtn.textContent = 'Interviewing';
+                } else if (newStatus === 'accepted') {
+                    statusBtn.classList.add('btn-success');
+                    statusBtn.textContent = 'Accepted';
+                } else if (newStatus === 'rejected') {
+                    statusBtn.classList.add('btn-danger');
+                    statusBtn.textContent = 'Rejected';
+                }
+                
+                // Show success toast
+                showToast(`Application status updated to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error updating application status', 'danger');
+        });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '5';
+        toast.innerHTML = `
+            <div class="toast show bg-${type} text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>

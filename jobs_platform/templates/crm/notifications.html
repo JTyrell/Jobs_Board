@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notifications | Jobs Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Your Notifications</h1>
+                {% if notifications %}
+                <a href="{% url 'crm:mark_all_notifications_read' %}" class="btn btn-sm btn-outline-primary">
+                    Mark All as Read
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if notifications %}
+                        <div class="list-group">
+                            {% for notification in notifications %}
+                                <a href="{% if notification.link %}{{ notification.link }}{% else %}{% url 'crm:mark_notification_read' notification.pk %}?next={{ request.path }}{% endif %}"
+                                   class="list-group-item list-group-item-action {% if not notification.is_read %}fw-bold bg-light{% endif %}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ notification.title }}</h5>
+                                        <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1">{{ notification.message }}</p>
+                                    <small class="text-muted">
+                                        {% if notification.type == 'application' %}
+                                            <i class="bi bi-briefcase me-1"></i> Application Update
+                                        {% elif notification.type == 'message' %}
+                                            <i class="bi bi-chat-left-text me-1"></i> New Message
+                                        {% elif notification.type == 'job_alert' %}
+                                            <i class="bi bi-bell me-1"></i> Job Alert
+                                        {% else %}
+                                            <i class="bi bi-info-circle me-1"></i> System Notification
+                                        {% endif %}
+                                    </small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if is_paginated %}
+                        <nav aria-label="Notification pagination" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                                </li>
+                                
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-bell-slash fs-1 text-muted mb-3"></i>
+                            <h3>No Notifications</h3>
+                            <p class="text-muted">You don't have any notifications at this time.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

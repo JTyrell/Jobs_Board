@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Jobs - Jobs Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/partials/jobseeker_sidebar.html' with active_tab='saved_jobs' %}
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Saved Jobs</h1>
+                <a href="{% url 'jobs:job_search' %}" class="btn btn-primary">Find More Jobs</a>
+            </div>
+            
+            {% if saved_jobs %}
+                <div class="job-list">
+                    {% for saved_job in saved_jobs %}
+                        <div class="card mb-4 job-card shadow-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                                        {% if saved_job.job.employer.company_logo %}
+                                            <img src="{{ saved_job.job.employer.company_logo.url }}" alt="{{ saved_job.job.employer.company_name }}" class="company-logo">
+                                        {% else %}
+                                            <div class="company-placeholder">{{ saved_job.job.employer.company_name|slice:":1" }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h5 class="card-title mb-1"><a href="{% url 'jobs:job_detail' saved_job.job.pk %}" class="text-decoration-none">{{ saved_job.job.title }}</a></h5>
+                                        <p class="card-subtitle mb-2 text-muted">{{ saved_job.job.employer.company_name }}</p>
+                                        
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            <span class="badge bg-light text-dark"><i class="fas fa-map-marker-alt"></i> {{ saved_job.job.location }}</span>
+                                            {% if saved_job.job.remote_option %}
+                                                <span class="badge bg-info">Remote</span>
+                                            {% endif %}
+                                            <span class="badge bg-secondary">{{ saved_job.job.get_job_type_display }}</span>
+                                            {% if saved_job.job.salary_is_displayed %}
+                                                <span class="badge bg-success"><i class="fas fa-money-bill-wave"></i> 
+                                                    {% if saved_job.job.salary_min and saved_job.job.salary_max %}
+                                                        ${{ saved_job.job.salary_min|floatformat:0 }} - ${{ saved_job.job.salary_max|floatformat:0 }}
+                                                    {% elif saved_job.job.salary_min %}
+                                                        From ${{ saved_job.job.salary_min|floatformat:0 }}
+                                                    {% elif saved_job.job.salary_max %}
+                                                        Up to ${{ saved_job.job.salary_max|floatformat:0 }}
+                                                    {% endif %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <p class="text-muted small">
+                                            <i class="far fa-clock me-1"></i> Saved {{ saved_job.created_at|timesince }} ago
+                                        </p>
+                                    </div>
+                                    <div class="col-md-3 text-center text-md-end">
+                                        <a href="{% url 'jobs:job_detail' saved_job.job.pk %}" class="btn btn-primary mb-2">View Job</a>
+                                        <a href="{% url 'jobs:job_apply' saved_job.job.id %}" class="btn btn-outline-primary mb-2 w-100">Apply Now</a>
+                                        <button class="btn btn-outline-secondary btn-sm save-job-btn" 
+                                            data-job-id="{{ saved_job.job.id }}" data-saved="true">
+                                            <i class="fas fa-heart"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                        <nav aria-label="Saved jobs pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1" aria-label="First">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ num }}</a>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="far fa-heart fa-4x text-muted"></i>
+                        </div>
+                        <h4 class="mb-3">You don't have any saved jobs yet</h4>
+                        <p class="text-muted mb-4">When you find a job you like, click the heart icon to save it for later.</p>
+                        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Browse Jobs</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle saved job buttons
+    const saveButtons = document.querySelectorAll('.save-job-btn');
+    
+    saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const jobId = this.dataset.jobId;
+            const card = this.closest('.job-card');
+            
+            fetch(`/jobs/save/${jobId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Remove the job card from the list with animation
+                    card.style.transition = 'opacity 0.3s, transform 0.3s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(20px)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // If no more saved jobs, refresh the page
+                        if (document.querySelectorAll('.job-card').length === 0) {
+                            window.location.reload();
+                        }
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

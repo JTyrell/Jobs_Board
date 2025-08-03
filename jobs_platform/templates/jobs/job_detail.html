@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} at {{ job.employer.company_name }} - Jobs Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="my-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'jobs:job_list' %}">Jobs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ job.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        {% if job.employer.company_logo %}
+                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="company-logo me-3">
+                        {% else %}
+                            <div class="company-placeholder me-3">{{ job.employer.company_name|slice:":1" }}</div>
+                        {% endif %}
+                        <div>
+                            <h1 class="h3 mb-0">{{ job.title }}</h1>
+                            <p class="mb-0 text-muted">{{ job.employer.company_name }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="job-info mb-4">
+                        <div class="d-flex flex-wrap gap-3 mb-3">
+                            <div>
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                                <span>{{ job.location }}</span>
+                                {% if job.remote_option %}
+                                    <span class="badge bg-info ms-1">Remote Option</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <i class="fas fa-briefcase text-primary"></i>
+                                <span>{{ job.get_job_type_display }}</span>
+                            </div>
+                            <div>
+                                <i class="fas fa-graduation-cap text-primary"></i>
+                                <span>{{ job.get_experience_level_display }}</span>
+                            </div>
+                            {% if job.salary_is_displayed %}
+                                <div>
+                                    <i class="fas fa-money-bill-wave text-primary"></i>
+                                    <span>
+                                        {% if job.salary_min and job.salary_max %}
+                                            ${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}
+                                        {% elif job.salary_min %}
+                                            From ${{ job.salary_min|floatformat:0 }}
+                                        {% elif job.salary_max %}
+                                            Up to ${{ job.salary_max|floatformat:0 }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <i class="fas fa-clock text-primary"></i>
+                                <span>Posted {{ job.created_at|timesince }} ago</span>
+                            </div>
+                        </div>
+                        
+                        {% if job.category or job.industry %}
+                            <div class="mb-3">
+                                {% if job.category %}
+                                    <a href="{% url 'jobs:job_search' %}?category={{ job.category.id }}" class="badge bg-light text-dark text-decoration-none me-2">
+                                        {{ job.category.name }}
+                                    </a>
+                                {% endif %}
+                                
+                                {% if job.industry %}
+                                    <a href="{% url 'jobs:job_search' %}?industry={{ job.industry.id }}" class="badge bg-light text-dark text-decoration-none">
+                                        {{ job.industry.name }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="job-description mb-4">
+                        <h4>Job Description</h4>
+                        <div class="formatted-text">
+                            {{ job.description|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <div class="job-requirements mb-4">
+                        <h4>Requirements</h4>
+                        <div class="formatted-text">
+                            {{ job.requirements|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    {% if job.application_deadline %}
+                        <div class="application-deadline mb-4">
+                            <p><strong>Application Deadline:</strong> {{ job.application_deadline }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="job-actions">
+                        {% if user.is_authenticated and user.user_type == 'jobseeker' %}
+                            {% if already_applied %}
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    You have already applied for this position.
+                                </div>
+                            {% else %}
+                                <a href="{% url 'jobs:job_apply' job.id %}" class="btn btn-primary btn-lg">Apply Now</a>
+                            {% endif %}
+                            
+                            <button class="btn btn-outline-secondary ms-2 save-job-btn" 
+                                data-job-id="{{ job.id }}" 
+                                data-saved="{% if job_saved %}true{% else %}false{% endif %}">
+                                <i class="{% if job_saved %}fas{% else %}far{% endif %} fa-heart"></i> 
+                                {% if job_saved %}Saved{% else %}Save Job{% endif %}
+                            </button>
+                        {% elif user.is_authenticated and user.user_type == 'employer' %}
+                            <div class="alert alert-info">
+                                You are logged in as an employer and cannot apply for jobs.
+                            </div>
+                        {% else %}
+                            <a href="{% url 'account_login' %}?next={% url 'jobs:job_detail' job.id %}" class="btn btn-primary btn-lg">Login to Apply</a>
+                            <a href="{% url 'account_signup' %}?user_type=jobseeker&next={% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary ms-2">Create Account to Apply</a>
+                        {% endif %}
+                        
+                        <div class="share-buttons mt-3">
+                            <span class="me-2">Share:</span>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text=Check out this job: {{ job.title }} at {{ job.employer.company_name }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!')">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">About the Company</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if job.employer.company_logo %}
+                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="company-logo-lg mb-2">
+                        {% else %}
+                            <div class="company-placeholder-lg mb-2">{{ job.employer.company_name|slice:":1" }}</div>
+                        {% endif %}
+                        <h5>{{ job.employer.company_name }}</h5>
+                    </div>
+                    
+                    {% if job.employer.company_website %}
+                        <p>
+                            <i class="fas fa-globe text-primary"></i>
+                            <a href="{{ job.employer.company_website }}" target="_blank" rel="noopener">Visit Website</a>
+                        </p>
+                    {% endif %}
+                    
+                    {% if job.employer.company_description %}
+                        <p>{{ job.employer.company_description|truncatewords:50 }}</p>
+                        <a href="#" class="text-decoration-none">Learn more about this company</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if similar_jobs %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Similar Jobs</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for similar_job in similar_jobs %}
+                            <div class="similar-job {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                                <h6 class="mb-1">
+                                    <a href="{% url 'jobs:job_detail' similar_job.pk %}" class="text-decoration-none">{{ similar_job.title }}</a>
+                                </h6>
+                                <p class="text-muted mb-1">{{ similar_job.employer.company_name }}</p>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <small><i class="fas fa-map-marker-alt"></i> {{ similar_job.location }}</small>
+                                    {% if similar_job.remote_option %}
+                                        <small class="badge bg-info">Remote</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle save job button
+    const saveButton = document.querySelector('.save-job-btn');
+    
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            const jobId = this.dataset.jobId;
+            const icon = this.querySelector('i');
+            
+            fetch(`/jobs/save/${jobId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Toggle heart icon
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('fas');
+                    
+                    // Update button text
+                    this.innerHTML = icon.outerHTML + (data.saved ? ' Saved' : ' Save Job');
+                    
+                    // Update saved state
+                    this.dataset.saved = data.saved ? 'true' : 'false';
+                    
+                    // Show feedback
+                    const message = data.saved ? 'Job saved successfully!' : 'Job removed from saved jobs.';
+                    showToast(message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Toast notification function
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '5';
+        toast.innerHTML = `
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

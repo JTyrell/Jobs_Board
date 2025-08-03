@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.id %}Edit Job: {{ form.instance.title }}{% else %}Create a New Job{% endif %} - Jobs Platform
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            {% include 'accounts/partials/employer_sidebar.html' with active_tab='post_job' %}
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">
+                        {% if form.instance.id %}
+                            Edit Job: {{ form.instance.title }}
+                        {% else %}
+                            Post a New Job
+                        {% endif %}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <h5>Basic Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label">Job Title *</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.title.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.category.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ form.industry.id_for_label }}" class="form-label">Industry *</label>
+                                    {{ form.industry }}
+                                    {% if form.industry.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.industry.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Job Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">Job Description *</label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.description.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Provide a comprehensive overview of the position.</div>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label for="{{ form.responsibilities.id_for_label }}" class="form-label">Responsibilities *</label>
+                                    {{ form.responsibilities }}
+                                    {% if form.responsibilities.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.responsibilities.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label for="{{ form.requirements.id_for_label }}" class="form-label">Requirements *</label>
+                                    {{ form.requirements }}
+                                    {% if form.requirements.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.requirements.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label for="{{ form.benefits.id_for_label }}" class="form-label">Benefits</label>
+                                    {{ form.benefits }}
+                                    {% if form.benefits.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.benefits.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Job Location & Type</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label">Location *</label>
+                                    {{ form.location }}
+                                    {% if form.location.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.location.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">City, State or Country</div>
+                                </div>
+                                
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ form.remote_option }}
+                                        <label class="form-check-label" for="{{ form.remote_option.id_for_label }}">
+                                            Remote Option Available
+                                        </label>
+                                        {% if form.remote_option.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.remote_option.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="{{ form.job_type.id_for_label }}" class="form-label">Job Type *</label>
+                                    {{ form.job_type }}
+                                    {% if form.job_type.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.job_type.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="{{ form.experience_level.id_for_label }}" class="form-label">Experience Level *</label>
+                                    {{ form.experience_level }}
+                                    {% if form.experience_level.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.experience_level.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="{{ form.education_level.id_for_label }}" class="form-label">Education Level</label>
+                                    {{ form.education_level }}
+                                    {% if form.education_level.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.education_level.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Compensation</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.salary_min.id_for_label }}" class="form-label">Minimum Salary (USD)</label>
+                                    {{ form.salary_min }}
+                                    {% if form.salary_min.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.salary_min.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="{{ form.salary_max.id_for_label }}" class="form-label">Maximum Salary (USD)</label>
+                                    {{ form.salary_max }}
+                                    {% if form.salary_max.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.salary_max.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ form.salary_is_displayed }}
+                                        <label class="form-check-label" for="{{ form.salary_is_displayed.id_for_label }}">
+                                            Display Salary Range
+                                        </label>
+                                        {% if form.salary_is_displayed.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.salary_is_displayed.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Application Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.application_deadline.id_for_label }}" class="form-label">Application Deadline</label>
+                                    {{ form.application_deadline }}
+                                    {% if form.application_deadline.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.application_deadline.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ form.application_url.id_for_label }}" class="form-label">External Application URL</label>
+                                    {{ form.application_url }}
+                                    {% if form.application_url.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.application_url.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Leave blank to use our built-in application system.</div>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label for="{{ form.custom_questions.id_for_label }}" class="form-label">Custom Questions for Applicants</label>
+                                    {{ form.custom_questions }}
+                                    {% if form.custom_questions.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.custom_questions.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Enter each question on a new line. These will be shown to applicants.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Publishing Options</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.status.id_for_label }}" class="form-label">Status *</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ form.is_featured }}
+                                        <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                            Feature this Job
+                                        </label>
+                                        {% if form.is_featured.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.is_featured.errors }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Featured jobs appear at the top of search results.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" onclick="history.back()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                {% if form.instance.id %}
+                                    Update Job
+                                {% else %}
+                                    Post Job
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

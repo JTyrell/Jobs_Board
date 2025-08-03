@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for {{ job.title }} - Jobs Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'jobs:job_list' %}">Jobs</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'jobs:job_detail' job.id %}">{{ job.title }}</a></li>
+                        <li class="breadcrumb-item active">Apply</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">Apply for {{ job.title }}</h1>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if job.employer.company_logo %}
+                                <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="me-3" style="width: 60px; height: 60px; object-fit: contain;">
+                            {% else %}
+                                <div class="company-placeholder me-3">{{ job.employer.company_name|slice:":1" }}</div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-1">{{ job.title }}</h5>
+                                <p class="mb-0 text-muted">{{ job.employer.company_name }} • {{ job.location }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge bg-secondary">{{ job.get_job_type_display }}</span>
+                            {% if job.remote_option %}
+                                <span class="badge bg-info">Remote</span>
+                            {% endif %}
+                            {% if job.salary_is_displayed %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-money-bill-wave"></i> 
+                                    {% if job.salary_min and job.salary_max %}
+                                        ${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}
+                                    {% elif job.salary_min %}
+                                        From ${{ job.salary_min|floatformat:0 }}
+                                    {% elif job.salary_max %}
+                                        Up to ${{ job.salary_max|floatformat:0 }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated and user.user_type == 'jobseeker' %}
+                        {% if already_applied %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                You've already applied for this position on {{ already_applied.created_at|date:"M d, Y" }}.
+                                <a href="{% url 'jobs:application_list' %}" class="alert-link">View your applications</a>
+                            </div>
+                        {% else %}
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="mb-4">
+                                    <h5>Personal Information</h5>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                            {{ form.first_name }}
+                                            {% if form.first_name.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.first_name.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                            {{ form.last_name }}
+                                            {% if form.last_name.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.last_name.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                            {{ form.email }}
+                                            {% if form.email.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.email.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                                            {{ form.phone }}
+                                            {% if form.phone.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.phone.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>Resume & Cover Letter</h5>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Resume</label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check me-4">
+                                                <input class="form-check-input" type="radio" name="resume_option" id="use_profile_resume" value="profile" checked>
+                                                <label class="form-check-label" for="use_profile_resume">
+                                                    Use profile resume
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="resume_option" id="upload_new_resume" value="new">
+                                                <label class="form-check-label" for="upload_new_resume">
+                                                    Upload new resume
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3" id="profile_resume_section">
+                                            {% if user.jobseeker_profile.resume %}
+                                                <div class="card bg-light">
+                                                    <div class="card-body d-flex align-items-center">
+                                                        <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                                                        <div>
+                                                            <p class="mb-0 fw-medium">Current Resume</p>
+                                                            <small class="text-muted">Uploaded: {{ user.jobseeker_profile.resume_upload_date|date:"M d, Y" }}</small>
+                                                        </div>
+                                                        <a href="{{ user.jobseeker_profile.resume.url }}" class="btn btn-sm btn-outline-primary ms-auto" target="_blank">
+                                                            <i class="fas fa-eye me-1"></i> View
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    You don't have a resume uploaded to your profile.
+                                                    <a href="{% url 'accounts:profile_edit' %}" class="alert-link">Upload one now</a> or choose "Upload new resume" option.
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="mt-3 d-none" id="new_resume_section">
+                                            <label for="{{ form.resume.id_for_label }}" class="form-label">Upload Resume (PDF format recommended)</label>
+                                            {{ form.resume }}
+                                            {% if form.resume.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.resume.errors }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">Max file size: 5MB. Supported formats: PDF, DOCX, DOC</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.cover_letter.id_for_label }}" class="form-label">Cover Letter (optional)</label>
+                                        {{ form.cover_letter }}
+                                        {% if form.cover_letter.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.cover_letter.errors }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Tell the employer why you're the best candidate for this job.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h5>Additional Information</h5>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.linkedin_profile.id_for_label }}" class="form-label">LinkedIn Profile (optional)</label>
+                                        {{ form.linkedin_profile }}
+                                        {% if form.linkedin_profile.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.linkedin_profile.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.portfolio_url.id_for_label }}" class="form-label">Portfolio/Website (optional)</label>
+                                        {{ form.portfolio_url }}
+                                        {% if form.portfolio_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.portfolio_url.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if job.custom_questions %}
+                                        <div class="mt-4 mb-3">
+                                            <h5>Additional Questions</h5>
+                                            <p class="text-muted">Please answer the following questions from the employer</p>
+                                            
+                                            {{ form.custom_answers }}
+                                            {% if form.custom_answers.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.custom_answers.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    {{ form.agree_to_terms }}
+                                    <label class="form-check-label" for="{{ form.agree_to_terms.id_for_label }}">
+                                        I agree to the <a href="#" target="_blank">Terms & Conditions</a> and <a href="#" target="_blank">Privacy Policy</a>
+                                    </label>
+                                    {% if form.agree_to_terms.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.agree_to_terms.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-user-lock fa-3x text-muted"></i>
+                            </div>
+                            <h5>Sign in to apply for this job</h5>
+                            <p class="text-muted">You need to be logged in as a Job Seeker to apply for this position.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary">Sign In</a>
+                                <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-outline-primary">Create Account</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle resume option toggle
+    const useProfileResume = document.getElementById('use_profile_resume');
+    const uploadNewResume = document.getElementById('upload_new_resume');
+    const profileResumeSection = document.getElementById('profile_resume_section');
+    const newResumeSection = document.getElementById('new_resume_section');
+    
+    if (useProfileResume && uploadNewResume) {
+        useProfileResume.addEventListener('change', function() {
+            if (this.checked) {
+                profileResumeSection.classList.remove('d-none');
+                newResumeSection.classList.add('d-none');
+            }
+        });
+        
+        uploadNewResume.addEventListener('change', function() {
+            if (this.checked) {
+                profileResumeSection.classList.add('d-none');
+                newResumeSection.classList.remove('d-none');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

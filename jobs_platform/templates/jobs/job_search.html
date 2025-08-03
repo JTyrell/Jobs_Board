@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Jobs - Jobs Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <!-- Advanced Search Sidebar -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Advanced Search</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'jobs:job_search' %}" method="get" id="job-search-form">
+                        <div class="mb-3">
+                            <label for="id_q" class="form-label">Keywords</label>
+                            {{ search_form.q }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_location" class="form-label">Location</label>
+                            {{ search_form.location }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_category" class="form-label">Job Category</label>
+                            <select name="category" id="id_category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                        {% if search_query.category == category.id|stringformat:"i" %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_industry" class="form-label">Industry</label>
+                            <select name="industry" id="id_industry" class="form-select">
+                                <option value="">All Industries</option>
+                                {% for industry in industries %}
+                                    <option value="{{ industry.id }}"
+                                        {% if search_query.industry == industry.id|stringformat:"i" %}selected{% endif %}>
+                                        {{ industry.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_job_type" class="form-label">Job Type</label>
+                            {{ search_form.job_type }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_experience" class="form-label">Experience Level</label>
+                            {{ search_form.experience }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remote" value="true" id="id_remote"
+                                    {% if search_query.remote == "true" %}checked{% endif %}>
+                                <label class="form-check-label" for="id_remote">
+                                    Remote Jobs Only
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Salary Range</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="number" name="min_salary" class="form-control" placeholder="Min" 
+                                        value="{{ search_query.min_salary }}">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" name="max_salary" class="form-control" placeholder="Max"
+                                        value="{{ search_query.max_salary }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="{% url 'jobs:job_search' %}" class="btn btn-outline-secondary">Clear Filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Popular Searches -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Popular Searches</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'jobs:job_search' %}?q=software+developer" class="badge bg-secondary text-decoration-none">Software Developer</a>
+                        <a href="{% url 'jobs:job_search' %}?q=marketing" class="badge bg-secondary text-decoration-none">Marketing</a>
+                        <a href="{% url 'jobs:job_search' %}?q=data+analyst" class="badge bg-secondary text-decoration-none">Data Analyst</a>
+                        <a href="{% url 'jobs:job_search' %}?q=project+manager" class="badge bg-secondary text-decoration-none">Project Manager</a>
+                        <a href="{% url 'jobs:job_search' %}?q=sales" class="badge bg-secondary text-decoration-none">Sales</a>
+                        <a href="{% url 'jobs:job_search' %}?remote=true" class="badge bg-secondary text-decoration-none">Remote Jobs</a>
+                        <a href="{% url 'jobs:job_search' %}?q=part+time&job_type=part_time" class="badge bg-secondary text-decoration-none">Part Time</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Search Results</h1>
+                
+                <div class="d-flex align-items-center">
+                    <span class="me-2">Sort:</span>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if search_query.sort == "relevance" %}
+                                Relevance
+                            {% elif search_query.sort == "oldest" %}
+                                Date (Oldest)
+                            {% elif search_query.sort == "salary_high" %}
+                                Salary (High to Low)
+                            {% elif search_query.sort == "salary_low" %}
+                                Salary (Low to High)
+                            {% else %}
+                                Date (Newest)
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="relevance">Relevance</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="newest">Date (Newest)</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="oldest">Date (Oldest)</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="salary_high">Salary (High to Low)</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="salary_low">Salary (Low to High)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search summary -->
+            <div class="search-summary mb-4">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <p class="mb-0">
+                        <strong>{{ jobs|length }}</strong> jobs found
+                        {% if search_form.q.value %}for <strong>"{{ search_form.q.value }}"</strong>{% endif %}
+                        {% if search_form.location.value %}in <strong>{{ search_form.location.value }}</strong>{% endif %}
+                    </p>
+                    
+                    <!-- Active filters display -->
+                    {% if search_query.category or search_query.industry or search_query.job_type or search_query.experience or search_query.remote == "true" or search_query.min_salary or search_query.max_salary %}
+                        <div class="ms-auto">
+                            <span class="me-2">Filters:</span>
+                            {% if search_query.category %}
+                                {% for cat in categories %}
+                                    {% if search_query.category == cat.id|stringformat:"i" %}
+                                        <span class="badge bg-primary me-1 filter-badge" data-filter="category">
+                                            {{ cat.name }} <i class="fas fa-times ms-1"></i>
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                            {% if search_query.industry %}
+                                {% for ind in industries %}
+                                    {% if search_query.industry == ind.id|stringformat:"i" %}
+                                        <span class="badge bg-primary me-1 filter-badge" data-filter="industry">
+                                            {{ ind.name }} <i class="fas fa-times ms-1"></i>
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                            {% if search_query.job_type %}
+                                <span class="badge bg-primary me-1 filter-badge" data-filter="job_type">
+                                    {{ search_form.job_type.value|title }} <i class="fas fa-times ms-1"></i>
+                                </span>
+                            {% endif %}
+                            
+                            {% if search_query.experience %}
+                                <span class="badge bg-primary me-1 filter-badge" data-filter="experience">
+                                    {{ search_form.experience.value|title }} Experience <i class="fas fa-times ms-1"></i>
+                                </span>
+                            {% endif %}
+                            
+                            {% if search_query.remote == "true" %}
+                                <span class="badge bg-primary me-1 filter-badge" data-filter="remote">
+                                    Remote <i class="fas fa-times ms-1"></i>
+                                </span>
+                            {% endif %}
+                            
+                            {% if search_query.min_salary or search_query.max_salary %}
+                                <span class="badge bg-primary me-1 filter-badge" data-filter="salary">
+                                    Salary Range <i class="fas fa-times ms-1"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if jobs %}
+                <div class="job-list">
+                    {% for job in jobs %}
+                        <div class="card mb-4 job-card shadow-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                                        {% if job.employer.company_logo %}
+                                            <img src="{{ job.employer.company_logo.url }}" alt="{{ job.employer.company_name }}" class="company-logo">
+                                        {% else %}
+                                            <div class="company-placeholder">{{ job.employer.company_name|slice:":1" }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h5 class="card-title mb-1"><a href="{% url 'jobs:job_detail' job.pk %}" class="text-decoration-none">{{ job.title }}</a></h5>
+                                        <p class="card-subtitle mb-2 text-muted">{{ job.employer.company_name }}</p>
+                                        
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            <span class="badge bg-light text-dark"><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                                            {% if job.remote_option %}
+                                                <span class="badge bg-info">Remote</span>
+                                            {% endif %}
+                                            <span class="badge bg-secondary">{{ job.get_job_type_display }}</span>
+                                            {% if job.salary_is_displayed %}
+                                                <span class="badge bg-success"><i class="fas fa-money-bill-wave"></i> 
+                                                    {% if job.salary_min and job.salary_max %}
+                                                        ${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}
+                                                    {% elif job.salary_min %}
+                                                        From ${{ job.salary_min|floatformat:0 }}
+                                                    {% elif job.salary_max %}
+                                                        Up to ${{ job.salary_max|floatformat:0 }}
+                                                    {% endif %}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <p class="card-text">{{ job.description|truncatewords:20 }}</p>
+                                    </div>
+                                    <div class="col-md-3 text-center text-md-end">
+                                        <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-primary mb-2">View Job</a>
+                                        
+                                        {% if user.is_authenticated and user.user_type == 'jobseeker' %}
+                                            <button class="btn btn-outline-secondary save-job-btn" 
+                                                data-job-id="{{ job.id }}" 
+                                                data-saved="{% if job.id in saved_jobs %}true{% else %}false{% endif %}">
+                                                <i class="{% if job.id in saved_jobs %}fas{% else %}far{% endif %} fa-heart"></i>
+                                            </button>
+                                        {% endif %}
+                                        <p class="text-muted mt-2 mb-0 small">Posted {{ job.created_at|timesince }} ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                        <nav aria-label="Job pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in search_query.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" aria-label="First">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in search_query.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ num }}</a>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% for key, value in search_query.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in search_query.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in search_query.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <h4>No jobs found matching your search criteria</h4>
+                    <p>Try adjusting your search terms or filters to find more jobs.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle sorting
+    const sortOptions = document.querySelectorAll('.sort-option');
+    const searchForm = document.getElementById('job-search-form');
+    
+    sortOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Create or get the sort input
+            let sortInput = searchForm.querySelector('input[name="sort"]');
+            if (!sortInput) {
+                sortInput = document.createElement('input');
+                sortInput.type = 'hidden';
+                sortInput.name = 'sort';
+                searchForm.appendChild(sortInput);
+            }
+            
+            // Set the sort value
+            sortInput.value = this.dataset.sort;
+            
+            // Submit the form
+            searchForm.submit();
+        });
+    });
+    
+    // Handle filter removal
+    const filterBadges = document.querySelectorAll('.filter-badge');
+    
+    filterBadges.forEach(badge => {
+        badge.addEventListener('click', function() {
+            const filterType = this.dataset.filter;
+            
+            // Remove the filter from the form
+            if (filterType === 'salary') {
+                // Remove both min and max salary
+                const minSalary = searchForm.querySelector('input[name="min_salary"]');
+                const maxSalary = searchForm.querySelector('input[name="max_salary"]');
+                if (minSalary) minSalary.value = '';
+                if (maxSalary) maxSalary.value = '';
+            } else {
+                // Remove the specific filter
+                const filterInput = searchForm.querySelector(`[name="${filterType}"]`);
+                if (filterInput) {
+                    if (filterInput.type === 'checkbox') {
+                        filterInput.checked = false;
+                    } else {
+                        filterInput.value = '';
+                    }
+                }
+            }
+            
+            // Submit the form
+            searchForm.submit();
+        });
+    });
+    
+    // Handle save job buttons
+    const saveButtons = document.querySelectorAll('.save-job-btn');
+    
+    saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const jobId = this.dataset.jobId;
+            const icon = this.querySelector('i');
+            
+            fetch(`/jobs/save/${jobId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Toggle heart icon
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('fas');
+                    
+                    // Update saved state
+                    this.dataset.saved = data.saved ? 'true' : 'false';
+                    
+                    // Show feedback
+                    const message = data.saved ? 'Job saved successfully!' : 'Job removed from saved jobs.';
+                    showToast(message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Toast notification function
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '5';
+        toast.innerHTML = `
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

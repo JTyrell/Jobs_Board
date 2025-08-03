@@ -1,0 +1,8 @@
+# Pillow requirements - install separately if image processing is needed
+# Working version for Python 3.13:
+Pillow==11.3.0
+
+# Alternative installation methods if the above fails:
+# pip install --only-binary=all Pillow
+# pip install --upgrade pip setuptools wheel
+# pip install Pillow 

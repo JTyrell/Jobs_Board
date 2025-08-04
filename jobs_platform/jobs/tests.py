@@ -1,13 +1,122 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
-from .models import Job, JobApplication, SavedJob, JobCategory, Industry, Skill
-from .forms import JobCreationForm, JobApplicationForm, JobSearchForm
-from accounts.models import JobSeekerProfile, EmployerProfile
-from datetime import date, timedelta
+from datetime import datetime, timedelta
+import tempfile
+import os
+
+from .models import Job, JobApplication, SavedJob, Skill, JobCategory, Industry
+from .forms import JobCreationForm, JobApplicationForm
+from accounts.models import EmployerProfile
 
 User = get_user_model()
+
+class PostJobRedirectTests(TestCase):
+    """Test the post_job_redirect view functionality"""
+    
+    def setUp(self):
+        self.client = Client()
+        self.post_job_url = reverse('jobs:post_job')
+        self.login_url = reverse('account_login')
+        self.home_url = reverse('core:home')
+        self.job_create_url = reverse('jobs:job_create')
+        
+        # Create test users
+        self.jobseeker = User.objects.create_user(
+            username='jobseeker',
+            email='jobseeker@test.com',
+            password='testpass123',
+            user_type='jobseeker'
+        )
+        
+        self.employer = User.objects.create_user(
+            username='employer',
+            email='employer@test.com',
+            password='testpass123',
+            user_type='employer'
+        )
+        
+        # Create employer profile
+        from accounts.models import EmployerProfile
+        self.employer_profile = EmployerProfile.objects.create(
+            user=self.employer,
+            company_name='Test Company',
+            company_website='https://testcompany.com',
+            industry='Technology',
+            company_size='10-50',
+            company_location='Test City'
+        )
+        
+        # Create required models
+        self.category = JobCategory.objects.create(name='Technology')
+        self.industry = Industry.objects.create(name='Software')
+        self.skill = Skill.objects.create(name='Python')
+    
+    def test_post_job_redirect_unauthenticated(self):
+        """Test that unauthenticated users are redirected to login"""
+        response = self.client.get(self.post_job_url)
+        
+        # Should redirect to login with next parameter
+        self.assertRedirects(response, f"{self.login_url}?next={self.job_create_url}")
+        
+        # Check for info message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Please log in to post a job', str(messages[0]))
+    
+    def test_post_job_redirect_authenticated_jobseeker(self):
+        """Test that authenticated jobseekers are redirected to home with warning"""
+        self.client.login(username='jobseeker', password='testpass123')
+        response = self.client.get(self.post_job_url)
+        
+        # Should redirect to home
+        self.assertRedirects(response, self.home_url)
+        
+        # Check for warning message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Only employers can post jobs', str(messages[0]))
+    
+    def test_post_job_redirect_authenticated_employer(self):
+        """Test that authenticated employers are redirected to job creation"""
+        self.client.login(username='employer', password='testpass123')
+        response = self.client.get(self.post_job_url)
+        
+        # Should redirect to job creation
+        self.assertRedirects(response, self.job_create_url)
+        
+        # Should not have any messages
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 0)
+    
+    def test_post_job_redirect_admin_user(self):
+        """Test that admin users are redirected to home with warning"""
+        admin_user = User.objects.create_user(
+            username='admin',
+            email='admin@test.com',
+            password='testpass123',
+            user_type='admin'
+        )
+        self.client.login(username='admin', password='testpass123')
+        response = self.client.get(self.post_job_url)
+        
+        # Should redirect to home
+        self.assertRedirects(response, self.home_url)
+        
+        # Check for warning message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Only employers can post jobs', str(messages[0]))
+    
+    def test_post_job_url_exists(self):
+        """Test that the post_job URL pattern exists"""
+        response = self.client.get(self.post_job_url)
+        # Should not return 404
+        self.assertNotEqual(response.status_code, 404)
+
 
 class JobModelTest(TestCase):
     def setUp(self):

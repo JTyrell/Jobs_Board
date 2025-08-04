@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'jobs',
     'crm',
+    'resume_processor',
 ]
 
 MIDDLEWARE = [

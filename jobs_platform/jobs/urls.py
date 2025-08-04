@@ -9,6 +9,9 @@ urlpatterns = [
     path('search/', views.JobSearchView.as_view(), name='job_search'),
     path('<int:pk>/', views.JobDetailView.as_view(), name='job_detail'),
     
+    # Post job redirect (handles authentication and user type)
+    path('post/', views.post_job_redirect, name='post_job'),
+    
     # Job management
     path('create/', views.JobCreateView.as_view(), name='job_create'),
     path('<int:pk>/update/', views.JobUpdateView.as_view(), name='job_update'),

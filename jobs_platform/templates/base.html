@@ -66,7 +66,7 @@
                                     {% elif user.user_type == 'employer' %}
                                         <a class="dropdown-item" href="{% url 'accounts:employer_dashboard' %}">My Dashboard</a>
                                         <a class="dropdown-item" href="{% url 'accounts:profile' %}">Company Profile</a>
-                                        <a class="dropdown-item" href="{% url 'jobs:job_create' %}">Post a Job</a>
+                                        <a class="dropdown-item" href="{% url 'jobs:post_job' %}">Post a Job</a>
                                     {% endif %}
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{% url 'crm:messages' %}">Messages</a>
@@ -129,7 +129,7 @@
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="{% url 'jobs:job_list' %}" class="text-light">Find Jobs</a></li>
-                        <li><a href="{% url 'jobs:job_create' %}" class="text-light">Post a Job</a></li>
+                        <li><a href="{% url 'jobs:post_job' %}" class="text-light">Post a Job</a></li>
                         <li><a href="{% url 'core:about' %}" class="text-light">About Us</a></li>
                         <li><a href="{% url 'core:contact' %}" class="text-light">Contact Us</a></li>
                         <li><a href="{% url 'core:faq' %}" class="text-light">FAQs</a></li>

@@ -14,6 +14,24 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
+def post_job_redirect(request):
+    """
+    Handle the 'Post a Job' link from footer and navigation.
+    Redirects to login if not authenticated, or to job creation if user is an employer.
+    """
+    if not request.user.is_authenticated:
+        # Redirect to login with next parameter to return to job creation after login
+        messages.info(request, 'Please log in to post a job.')
+        return redirect(f"{reverse('account_login')}?next={reverse('jobs:job_create')}")
+    
+    if request.user.user_type != 'employer':
+        # User is logged in but not an employer
+        messages.warning(request, 'Only employers can post jobs. Please contact support if you need to change your account type.')
+        return redirect('core:home')
+    
+    # User is authenticated and is an employer, redirect to job creation
+    return redirect('jobs:job_create')
+
 class JobListView(ListView):
     model = Job
     template_name = 'jobs/job_list.html'

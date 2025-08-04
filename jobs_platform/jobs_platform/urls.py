@@ -14,8 +14,9 @@ urlpatterns = [
     path('', include('core.urls')),  # Core app handles main pages
     path('jobs/', include('jobs.urls')),  # Jobs related features
     path('accounts/', include('accounts.urls')),  # User accounts features
-    path('crm/', include('crm.urls')),  # CRM features
-    # Django allauth URLs - for authentication
+                    path('crm/', include('crm.urls')),  # CRM features
+                path('resume/', include('resume_processor.urls')),  # Resume processing
+                # Django allauth URLs - for authentication
     # Alias for backward compatibility with older allauth route names
     path('auth/password/reset/key/<uidb64>-<key>/', password_reset_from_key_compat, name='account_reset_password_from_key'),
 

@@ -390,15 +390,15 @@ class CoreIntegrationTest(TestCase):
         
         # Check featured jobs
         self.assertIn('featured_jobs', response.context)
-        self.assertIsInstance(response.context['featured_jobs'], list)
+        self.assertIsInstance(list(response.context['featured_jobs']), list)
         
         # Check job categories
         self.assertIn('job_categories', response.context)
-        self.assertIsInstance(response.context['job_categories'], list)
+        self.assertIsInstance(list(response.context['job_categories']), list)
         
         # Check testimonials
         self.assertIn('testimonials', response.context)
-        self.assertIsInstance(response.context['testimonials'], list)
+        self.assertIsInstance(list(response.context['testimonials']), list)
 
     def test_faq_categorization(self):
         """Test that FAQs are properly categorized"""

@@ -1,0 +1,23 @@
+<div class="list-group">
+    <a href="{% url 'accounts:employer_dashboard' %}" class="list-group-item list-group-item-action {% if active_tab == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+    </a>
+    <a href="{% url 'jobs:job_create' %}" class="list-group-item list-group-item-action {% if active_tab == 'post_job' %}active{% endif %}">
+        <i class="fas fa-plus-circle me-2"></i> Post a Job
+    </a>
+    <a href="#" class="list-group-item list-group-item-action {% if active_tab == 'manage_jobs' %}active{% endif %}">
+        <i class="fas fa-briefcase me-2"></i> Manage Jobs
+    </a>
+    <a href="{% url 'jobs:application_list' %}" class="list-group-item list-group-item-action {% if active_tab == 'applications' %}active{% endif %}">
+        <i class="fas fa-file-alt me-2"></i> Applications
+    </a>
+    <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+        <i class="fas fa-building me-2"></i> Company Profile
+    </a>
+    <a href="#" class="list-group-item list-group-item-action">
+        <i class="fas fa-chart-line me-2"></i> Analytics
+    </a>
+    <a href="{% url 'account_logout' %}" class="list-group-item list-group-item-action text-danger">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</div>

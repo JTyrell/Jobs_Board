@@ -1,0 +1,23 @@
+<div class="list-group">
+    <a href="{% url 'accounts:jobseeker_dashboard' %}" class="list-group-item list-group-item-action {% if active_tab == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+    </a>
+    <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+        <i class="fas fa-user me-2"></i> My Profile
+    </a>
+    <a href="{% url 'accounts:profile_edit' %}" class="list-group-item list-group-item-action {% if active_tab == 'edit_profile' %}active{% endif %}">
+        <i class="fas fa-edit me-2"></i> Edit Profile
+    </a>
+    <a href="{% url 'jobs:saved_jobs' %}" class="list-group-item list-group-item-action {% if active_tab == 'saved_jobs' %}active{% endif %}">
+        <i class="fas fa-bookmark me-2"></i> Saved Jobs
+    </a>
+    <a href="{% url 'jobs:application_list' %}" class="list-group-item list-group-item-action {% if active_tab == 'applications' %}active{% endif %}">
+        <i class="fas fa-file-alt me-2"></i> My Applications
+    </a>
+    <a href="{% url 'crm:job_alerts' %}" class="list-group-item list-group-item-action {% if active_tab == 'job_alerts' %}active{% endif %}">
+        <i class="fas fa-bell me-2"></i> Job Alerts
+    </a>
+    <a href="{% url 'account_logout' %}" class="list-group-item list-group-item-action text-danger">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</div>

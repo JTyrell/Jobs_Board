@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Email Verification" %}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="alert alert-info text-center shadow-sm">
+        <h4 class="alert-heading mb-3">{% trans "Verify Your Email" %}</h4>
+        <p>{% trans "We have sent you an email for verification. Please check your inbox and click on the link." %}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

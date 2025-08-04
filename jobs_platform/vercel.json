@@ -1,31 +1,26 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "jobs_platform/wsgi.py",
-        "use": "@vercel/python",
-        "config": {
-          "maxLambdaSize": "15mb",
-          "runtime": "python3.9"
-        }
-      },
-      {
-        "src": "build_files.sh",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "staticfiles_build"
-        }
-      }
-    ],
-    "routes": [
-      {
-        "src": "/static/(.*)",
-        "dest": "/static/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "jobs_platform/wsgi.py"
-      }
-    ]
+  "builds": [
+    {
+      "src": "jobs_platform/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "jobs_platform/wsgi.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "jobs_platform.settings",
+    "DJANGO_DEBUG": "False",
+    "DJANGO_SECRET_KEY": "@django-secret-key"
+  },
+  "functions": {
+    "jobs_platform/wsgi.py": {
+      "maxDuration": 30
+    }
   }
+}
+  
   

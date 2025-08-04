@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Email Confirmation Sent" %}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="alert alert-info text-center shadow-sm">
+        <h4 class="alert-heading mb-3">{% trans "Check Your Inbox" %}</h4>
+        <p>{% trans "We've sent you an email with a confirmation link. Please click the link to activate your account." %}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

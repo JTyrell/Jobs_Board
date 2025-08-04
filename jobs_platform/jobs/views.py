@@ -44,12 +44,12 @@ class JobSearchView(ListView):
             # Keywords search
             keywords = form.cleaned_data.get('q')
             if keywords:
-                query = SearchQuery(keywords)
-                search_vector = SearchVector('title', 'description', 'requirements', 'employer__company_name')
-                queryset = queryset.annotate(
-                    search=search_vector,
-                    rank=SearchRank(search_vector, query)
-                ).filter(search=query).order_by('-rank')
+                queryset = queryset.filter(
+                    Q(title__icontains=keywords) |
+                    Q(description__icontains=keywords) |
+                    Q(requirements__icontains=keywords) |
+                    Q(employer__company_name__icontains=keywords)
+                )
             
             # Location filter
             location = form.cleaned_data.get('location')
@@ -120,7 +120,7 @@ class JobDetailView(DetailView):
         if self.request.user.is_authenticated:
             context['already_applied'] = JobApplication.objects.filter(
                 job=job, 
-                applicant=self.request.user
+                applicant__user=self.request.user
             ).exists()
             
             context['job_saved'] = SavedJob.objects.filter(
@@ -130,7 +130,7 @@ class JobDetailView(DetailView):
         
         # Similar jobs
         context['similar_jobs'] = Job.objects.filter(
-            Q(category=job.category) | Q(industry=job.industry),
+            Q(category=job.category) | Q(industries__in=job.industries.all()),
             status='published'
         ).exclude(id=job.id).select_related('employer')[:4]
         
@@ -161,6 +161,8 @@ class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'jobs/job_form.html'
     
     def test_func(self):
+        if not hasattr(self.request.user, 'employer_profile'):
+            return False
         job = self.get_object()
         return self.request.user.employer_profile == job.employer
     
@@ -178,6 +180,8 @@ class JobDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy('accounts:employer_dashboard')
     
     def test_func(self):
+        if not hasattr(self.request.user, 'employer_profile'):
+            return False
         job = self.get_object()
         return self.request.user.employer_profile == job.employer
     
@@ -207,12 +211,12 @@ class JobApplicationCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         job = self.get_job()
         
         # Check if already applied
-        if JobApplication.objects.filter(job=job, applicant=self.request.user).exists():
+        if JobApplication.objects.filter(job=job, applicant__user=self.request.user).exists():
             messages.error(self.request, 'You have already applied for this job.')
             return redirect('jobs:job_detail', pk=job.pk)
         
         form.instance.job = job
-        form.instance.applicant = self.request.user
+        form.instance.applicant = self.request.user.jobseeker_profile
         form.instance.status = 'pending'
         messages.success(self.request, 'Your application has been submitted successfully!')
         return super().form_valid(form)
@@ -231,13 +235,13 @@ class ApplicationListView(LoginRequiredMixin, ListView):
         if hasattr(self.request.user, 'jobseeker_profile'):
             # Job seeker viewing their applications
             return JobApplication.objects.filter(
-                applicant=self.request.user
-            ).select_related('job', 'job__employer').order_by('-created_at')
+                applicant__user=self.request.user
+            ).select_related('job', 'job__employer').order_by('-applied_at')
         elif hasattr(self.request.user, 'employer_profile'):
             # Employer viewing applications for their jobs
             return JobApplication.objects.filter(
                 job__employer=self.request.user.employer_profile
-            ).select_related('job', 'applicant').order_by('-created_at')
+            ).select_related('job', 'applicant').order_by('-applied_at')
         return JobApplication.objects.none()
     
     def get_context_data(self, **kwargs):
@@ -255,7 +259,7 @@ class SavedJobsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return SavedJob.objects.filter(
             user=self.request.user
-        ).select_related('job', 'job__employer').order_by('-created_at')
+        ).select_related('job', 'job__employer').order_by('-saved_at')
 
 
 def toggle_saved_job(request, job_id):

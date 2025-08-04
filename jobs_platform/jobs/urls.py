@@ -11,7 +11,7 @@ urlpatterns = [
     
     # Job management
     path('create/', views.JobCreateView.as_view(), name='job_create'),
-    path('<int:pk>/edit/', views.JobUpdateView.as_view(), name='job_edit'),
+    path('<int:pk>/update/', views.JobUpdateView.as_view(), name='job_update'),
     path('<int:pk>/delete/', views.JobDeleteView.as_view(), name='job_delete'),
     
     # Job applications
@@ -22,5 +22,5 @@ urlpatterns = [
     
     # Saved jobs
     path('saved/', views.SavedJobsView.as_view(), name='saved_jobs'),
-    path('save/<int:job_id>/', views.toggle_saved_job, name='toggle_saved_job'),
+    path('<int:job_id>/toggle-saved/', views.toggle_saved_job, name='toggle_saved_job'),
 ]

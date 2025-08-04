@@ -68,6 +68,7 @@ class MessageForm(forms.ModelForm):
     def save(self, commit=True):
         message = super().save(commit=False)
         message.sender = self.sender
+        message.recipient = self.recipient
         
         if commit:
             # If thread doesn't exist, create a new one

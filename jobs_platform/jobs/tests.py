@@ -304,13 +304,13 @@ class JobsViewsTest(TestCase):
 
     def test_job_application_create_view(self):
         self.client.login(username='jobseeker', password='testpass123')
-        response = self.client.get(reverse('jobs:job_apply', kwargs={'pk': self.job1.pk}))
+        response = self.client.get(reverse('jobs:job_apply', kwargs={'job_id': self.job1.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'jobs/job_application_form.html')
 
     def test_job_application_create_view_unauthorized(self):
         self.client.login(username='employer', password='testpass123')
-        response = self.client.get(reverse('jobs:job_apply', kwargs={'pk': self.job1.pk}))
+        response = self.client.get(reverse('jobs:job_apply', kwargs={'job_id': self.job1.pk}))
         self.assertEqual(response.status_code, 403)  # Forbidden
 
     def test_job_application_create_post(self):
@@ -325,7 +325,7 @@ class JobsViewsTest(TestCase):
             'portfolio_url': 'https://johndoe.dev',
             'agree_to_terms': True
         }
-        response = self.client.post(reverse('jobs:job_apply', kwargs={'pk': self.job1.pk}), form_data)
+        response = self.client.post(reverse('jobs:job_apply', kwargs={'job_id': self.job1.pk}), form_data)
         self.assertEqual(response.status_code, 302)  # Redirect after successful application
         
         # Check if application was created
@@ -384,7 +384,7 @@ class JobsURLsTest(TestCase):
         self.assertEqual(url, '/jobs/1/delete/')
 
     def test_job_apply_url(self):
-        url = reverse('jobs:job_apply', kwargs={'pk': 1})
+        url = reverse('jobs:job_apply', kwargs={'job_id': 1})
         self.assertEqual(url, '/jobs/1/apply/')
 
     def test_application_list_url(self):
@@ -492,7 +492,7 @@ class JobsIntegrationTest(TestCase):
             'portfolio_url': 'https://johndoe.dev',
             'agree_to_terms': True
         }
-        response = self.client.post(reverse('jobs:job_apply', kwargs={'pk': new_job.pk}), application_data)
+        response = self.client.post(reverse('jobs:job_apply', kwargs={'job_id': new_job.pk}), application_data)
         self.assertEqual(response.status_code, 302)
         
         # Check application was created

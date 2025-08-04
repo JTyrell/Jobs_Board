@@ -1,0 +1,39 @@
+{
+  "name": "SONJA Jobs Board",
+  "description": "A comprehensive job board platform with CRM features",
+  "repository": "https://github.com/yourusername/sonja-jobs-board",
+  "logo": "https://your-logo-url.com/logo.png",
+  "keywords": ["django", "python", "jobs", "crm"],
+  "env": {
+    "DJANGO_SECRET_KEY": {
+      "description": "A secret key for Django",
+      "generator": "secret"
+    },
+    "DJANGO_DEBUG": {
+      "description": "Set to False in production",
+      "value": "False"
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL database URL"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "python manage.py migrate"
+  }
+} 

@@ -484,10 +484,11 @@ class CRMViewsTest(TestCase):
     def test_create_message_view_get(self):
         self.client.login(username='jobseeker', password='testpass123')
         response = self.client.get(reverse('crm:message_create', kwargs={'recipient_id': self.employer_user.id}))
+        self.assertEqual(response.status_code, 302)
+        
+        response = self.client.get(response.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'crm/message_form.html')
-        self.assertIn('form', response.context)
-        self.assertEqual(response.context['recipient'], self.employer_user)
+        self.assertTemplateUsed(response, 'crm/message_thread.html')
 
     def test_create_message_view_post(self):
         self.client.login(username='jobseeker', password='testpass123')

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crm_tags %}
 
 {% block title %}Messages | Jobs Platform{% endblock %}
 
@@ -36,11 +37,11 @@
                                                     {% endif %}
                                                 {% endwith %}
                                                 
-                                                {% with unread_count=thread.get_unread_count(request.user) %}
+...
+{% get_unread_count thread request.user as unread_count %}
                                                     {% if unread_count > 0 %}
                                                         <span class="badge rounded-pill bg-primary">{{ unread_count }}</span>
                                                     {% endif %}
-                                                {% endwith %}
                                             </a>
                                         {% endwith %}
                                     {% endif %}

@@ -98,10 +98,10 @@ def message_thread_view(request, thread_id):
     # Mark messages as read
     unread_messages = messages_list.filter(
         ~Q(sender=request.user),
-        read_by__isnull=True
+        is_read=False
     )
     for message in unread_messages:
-        message.read_by.add(request.user)
+        message.mark_as_read()
     
     # Get the other participant
     recipient = thread.participants.exclude(id=request.user.id).first()

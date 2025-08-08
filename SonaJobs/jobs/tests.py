@@ -4,13 +4,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import tempfile
 import os
 
 from .models import Job, JobApplication, SavedJob, Skill, JobCategory, Industry
 from .forms import JobCreationForm, JobApplicationForm
-from accounts.models import EmployerProfile
+from accounts.models import EmployerProfile, JobSeekerProfile
 
 User = get_user_model()
 

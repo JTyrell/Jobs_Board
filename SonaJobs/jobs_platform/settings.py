@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     # Local apps
     'core',
     'accounts',
-    'jobs',
     'crm',
     'resume_processor',
+    'jobs',
 ]
 
 MIDDLEWARE = [

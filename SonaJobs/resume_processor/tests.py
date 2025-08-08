@@ -10,7 +10,7 @@ import json
 from .processor import ResumeProcessor
 from .models import ResumeAnalysis, ExtractedSkill, ExtractedExperience, ExtractedEducation
 from jobs.models import Job, JobApplication, JobCategory, Industry, Skill
-from accounts.models import EmployerProfile
+from accounts.models import EmployerProfile, JobSeekerProfile
 
 User = get_user_model()
 
@@ -45,6 +45,13 @@ class ResumeProcessorTestCase(TestCase):
             company_location='Test City'
         )
         
+        # Create jobseeker profile
+        self.jobseeker_profile = JobSeekerProfile.objects.create(
+            user=self.jobseeker,
+            headline='Python Developer',
+            bio='Experienced developer'
+        )
+        
         # Create test models
         self.category = JobCategory.objects.create(name='Technology')
         self.industry = Industry.objects.create(name='Software')
@@ -53,17 +60,20 @@ class ResumeProcessorTestCase(TestCase):
         self.skill3 = Skill.objects.create(name='JavaScript')
         
         # Create test job
+        from datetime import date, timedelta
         self.job = Job.objects.create(
             title='Software Engineer',
             employer=self.employer_profile,
             category=self.category,
             description='We are looking for a Python developer with Django experience.',
             requirements='Bachelor degree in Computer Science, 3+ years experience',
+            responsibilities='Develop web applications using Django',
             location='Remote',
             salary_min=60000,
             salary_max=80000,
-            job_type='full-time',
+            job_type='full_time',
             experience_level='mid',
+            application_deadline=date.today() + timedelta(days=30),
             status='published'
         )
         self.job.skills_required.add(self.skill1, self.skill2)
@@ -71,7 +81,7 @@ class ResumeProcessorTestCase(TestCase):
         # Create test application
         self.application = JobApplication.objects.create(
             job=self.job,
-            applicant=self.jobseeker,
+            applicant=self.jobseeker_profile,
             cover_letter='I am interested in this position.',
             status='pending'
         )

@@ -182,18 +182,19 @@ class ResumeProcessor:
             application = JobApplication.objects.get(id=application_id)
             
             # Create or update ResumeAnalysis
+            raw_text = extraction_result.get('raw_text', '') if extraction_result else ''
             analysis, created = ResumeAnalysis.objects.get_or_create(
                 application=application,
                 defaults={
-                    'raw_text': extraction_result['raw_text'][:10000],  # Limit text length
-                    'confidence_score': entities_result.get('overall_confidence', 0.0)
+                    'raw_text': raw_text[:10000],  # Limit text length
+                    'confidence_score': entities_result.get('overall_confidence', 0.0) if entities_result else 0.0
                 }
             )
             
             if not created:
                 # Update existing analysis
-                analysis.raw_text = extraction_result['raw_text'][:10000]
-                analysis.confidence_score = entities_result.get('overall_confidence', 0.0)
+                analysis.raw_text = raw_text[:10000]
+                analysis.confidence_score = entities_result.get('overall_confidence', 0.0) if entities_result else 0.0
                 analysis.save()
             
             # Store extracted skills
@@ -252,18 +253,18 @@ class ResumeProcessor:
                 job=job,
                 defaults={
                     'overall_score': match_result['overall_score'],
-                    'skills_match': match_result['skills_match'] * 100,
-                    'experience_match': match_result['experience_match'] * 100,
-                    'education_match': match_result['education_match'] * 100
+                    'skills_match': match_result['skills_match'] * 100 if isinstance(match_result['skills_match'], (int, float)) else 0.0,
+                    'experience_match': match_result['experience_match'] * 100 if isinstance(match_result['experience_match'], (int, float)) else 0.0,
+                    'education_match': match_result['education_match'] * 100 if isinstance(match_result['education_match'], (int, float)) else 0.0
                 }
             )
             
             if not created:
                 # Update existing match score
                 match_score.overall_score = match_result['overall_score']
-                match_score.skills_match = match_result['skills_match'] * 100
-                match_score.experience_match = match_result['experience_match'] * 100
-                match_score.education_match = match_result['education_match'] * 100
+                match_score.skills_match = match_result['skills_match'] * 100 if isinstance(match_result['skills_match'], (int, float)) else 0.0
+                match_score.experience_match = match_result['experience_match'] * 100 if isinstance(match_result['experience_match'], (int, float)) else 0.0
+                match_score.education_match = match_result['education_match'] * 100 if isinstance(match_result['education_match'], (int, float)) else 0.0
                 match_score.save()
             
             logger.info(f"Stored match score for analysis {analysis_id} and job {job_id}")

@@ -16,7 +16,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', secrets.token_urlsafe(50)) # noqa: S
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS configuration
+ALLOWED_HOSTS = ['*']  # Vercel will handle this automatically
 
 # Application definition
 
@@ -84,6 +85,7 @@ WSGI_APPLICATION = 'jobs_platform.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Default to SQLite for development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -92,8 +94,10 @@ DATABASES = {
 }
 
 # Update database configuration from $DATABASE_URL for production
-db_from_env = dj_database_url.config(conn_max_age=600)
-DATABASES['default'].update(db_from_env)
+# Vercel will provide DATABASE_URL environment variable
+db_from_env = dj_database_url.config(conn_max_age=600, default='sqlite:///db.sqlite3')
+if db_from_env:
+    DATABASES['default'] = db_from_env
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -134,9 +138,19 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+# Static files storage for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# For Vercel deployment, we'll use a temporary media storage
+# In production, consider using AWS S3 or similar
+if not DEBUG:
+    # Use a temporary directory for media files in serverless environment
+    import tempfile
+    MEDIA_ROOT = tempfile.mkdtemp()
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -185,6 +199,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://your-frontend-domain.com",
     "http://localhost:3000",
 ]
+
+# For Vercel deployment, allow all origins in development
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # REST Framework settings
 REST_FRAMEWORK = {

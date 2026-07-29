@@ -296,20 +296,6 @@ charts/*.tgz
 microk8s/
 
 # Local development databases
-*.db
-*.sqlite
-*.sqlite3
-
-# Local development files
-local_*
-dev_*
-test_*
-
-# Backup and temporary files
-*~
-*.swp
-*.swo
-*#
 
 # Editor directories and files
 .vscode/
@@ -359,3 +345,4 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk 
+.env

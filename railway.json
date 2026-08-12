@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "cd SonaJobs && pip install -r requirements.txt && python manage.py makemigrations accounts jobs && python manage.py collectstatic --noinput"
+    "buildCommand": "cd SonaJobs && python -m pip install -r requirements.txt && python manage.py makemigrations accounts jobs && python manage.py collectstatic --noinput"
   },
   "deploy": {
     "startCommand": "cd SonaJobs && python manage.py migrate && gunicorn jobs_platform.wsgi:application --bind 0.0.0.0:$PORT"

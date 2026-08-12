@@ -331,3 +331,71 @@ class ResumeProcessor:
         except Exception as e:
             validation['issues'].append(f"Validation error: {str(e)}")
             return validation 
+
+    @transaction.atomic
+    def update_talent_profile(self, user, entities_result: Dict[str, Any]) -> bool:
+        """Update JobSeekerProfile with extracted skills and experience"""
+        try:
+            from jobs.models import Skill
+            
+            if not hasattr(user, 'jobseeker_profile'):
+                return False
+                
+            profile = user.jobseeker_profile
+            
+            # Update skills
+            for skill_data in entities_result.get('skills', []):
+                skill_name = skill_data.get('name')
+                if skill_name:
+                    skill_obj, _ = Skill.objects.get_or_create(name__iexact=skill_name, defaults={'name': skill_name})
+                    profile.skills.add(skill_obj)
+            
+            # Update experience years
+            if entities_result.get('experience'):
+                total_years = self.ai_processor._calculate_total_experience_years(entities_result['experience'])
+                if total_years > profile.years_of_experience:
+                    profile.years_of_experience = total_years
+            
+            profile.save()
+            logger.info(f"Updated talent profile for user {user.id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating talent profile: {e}")
+            return False
+            
+    def match_profile_to_available_jobs(self, profile) -> list:
+        """Match a JobSeekerProfile against all active jobs"""
+        from jobs.models import Job
+        
+        resume_data = {
+            'skills': [{'name': s.name} for s in profile.skills.all()],
+            'experience': [{'duration': f"{profile.years_of_experience} years"}],
+            'education': [], 
+            'raw_text': f"{profile.headline} {profile.bio}"
+        }
+        
+        active_jobs = Job.objects.filter(status='published')
+        matches = []
+        
+        for job in active_jobs:
+            job_reqs = {
+                'job_id': job.id,
+                'title': job.title,
+                'description': job.description,
+                'requirements': job.requirements,
+                'skills_required': [{'name': s.name} for s in job.skills_required.all()]
+            }
+            
+            match_result = self.match_resume_to_job(resume_data, job_reqs)
+            if match_result['success'] and match_result['match_result']['overall_score'] >= 40:
+                matches.append({
+                    'job_id': job.id,
+                    'title': job.title,
+                    'employer': job.employer.company_name if job.employer else 'Unknown',
+                    'match_score': match_result['match_result']['overall_score'],
+                    'recommendations': match_result['match_result'].get('recommendations', [])
+                })
+                
+        matches.sort(key=lambda x: x['match_score'], reverse=True)
+        return matches[:10]

@@ -5,6 +5,8 @@ from pathlib import Path
 import tempfile
 import os
 
+from .vision_extractor import VisionExtractor
+
 logger = logging.getLogger(__name__)
 
 
@@ -79,6 +81,15 @@ class PDFExtractor:
                 extracted_data['success'] = True
                 extracted_data['total_words'] = len(extracted_data['raw_text'].split())
                 
+                # Check if we should fallback to OCR (e.g. Scanned PDF with < 50 words)
+                if extracted_data['total_words'] < 50 and len(pdf.pages) > 0:
+                    logger.info("PDF has very few words. Falling back to OCR Vision Extraction.")
+                    vision_extractor = VisionExtractor()
+                    ocr_data = vision_extractor.extract_text(file_path)
+                    if ocr_data['success']:
+                        logger.info("OCR Extraction successful.")
+                        return ocr_data
+                        
                 logger.info(f"Successfully extracted {extracted_data['total_words']} words from {len(pdf.pages)} pages")
                 
         except Exception as e:

@@ -76,3 +76,20 @@ class SavedJob(models.Model):
 
     def __str__(self):
         return f"{self.user.username} saved {self.job.title}"
+
+class JobRecommendation(models.Model):
+    job_seeker = models.ForeignKey(
+        'accounts.JobSeekerProfile', 
+        on_delete=models.CASCADE, 
+        related_name='recommendations'
+    )
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='recommended_to')
+    score = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('job_seeker', 'job')
+        ordering = ['-score']
+
+    def __str__(self):
+        return f"Match: {self.job_seeker} -> {self.job.title} ({self.score})"

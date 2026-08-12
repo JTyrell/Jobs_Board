@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', secrets.token_urlsafe(50)) # noqa: S
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration
-ALLOWED_HOSTS = ['*']  # Vercel will handle this automatically
+ALLOWED_HOSTS = ['*']  # Railway handles routing
 
 # Application definition
 
@@ -94,7 +94,7 @@ DATABASES = {
 }
 
 # Update database configuration from $DATABASE_URL for production
-# Vercel will provide DATABASE_URL environment variable
+# Railway will provide DATABASE_URL environment variable
 db_from_env = dj_database_url.config(conn_max_age=600, default='sqlite:///db.sqlite3')
 if db_from_env:
     DATABASES['default'] = db_from_env
@@ -145,12 +145,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# For Vercel deployment, we'll use a temporary media storage
-# In production, consider using AWS S3 or similar
-if not DEBUG:
-    # Use a temporary directory for media files in serverless environment
-    import tempfile
-    MEDIA_ROOT = tempfile.mkdtemp()
+# Note: In production on Railway, consider using AWS S3 or a persistent volume
+# for uploaded files to persist across deployments.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -200,7 +196,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-# For Vercel deployment, allow all origins in development
+# Allow all origins in development
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 

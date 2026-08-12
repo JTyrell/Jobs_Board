@@ -11,6 +11,7 @@ import json
 from .processor import ResumeProcessor
 from .models import ResumeAnalysis, ResumeMatchScore
 from jobs.models import Job, JobApplication
+from .tasks import run_auto_talent_match
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,13 @@ def process_resume_api(request):
         result = processor.process_resume(uploaded_file, application_id)
         
         if result['success']:
+            # If the user is authenticated and is a jobseeker, update their profile
+            if request.user.is_authenticated and hasattr(request.user, 'jobseeker_profile'):
+                processor.update_talent_profile(request.user, result['entities'])
+                # Trigger Celery task for auto-matching in the background
+                run_auto_talent_match.delay(request.user.id)
+                logger.info(f"Triggered auto-match for user {request.user.id}")
+
             # Return success response with extracted data
             response_data = {
                 'success': True,
@@ -386,3 +394,42 @@ def validate_file_api(request):
             'success': False,
             'error': 'Internal server error'
         }, status=500) 
+
+@csrf_exempt
+@require_POST
+def trigger_talent_match_api(request):
+    """
+    API endpoint to manually trigger a talent match against all jobs for the current user.
+    """
+    if not request.user.is_authenticated or not hasattr(request.user, 'jobseeker_profile'):
+        return JsonResponse({'success': False, 'error': 'Must be an authenticated job seeker'}, status=403)
+        
+    try:
+        profile = request.user.jobseeker_profile
+        processor = ResumeProcessor()
+        matches = processor.match_profile_to_available_jobs(profile)
+        
+        # Save recommendations
+        from jobs.models import JobRecommendation, Job
+        new_recs = 0
+        for match in matches:
+            try:
+                job = Job.objects.get(id=match['job_id'])
+                rec, created = JobRecommendation.objects.update_or_create(
+                    job_seeker=profile,
+                    job=job,
+                    defaults={'score': match['match_score']}
+                )
+                if created:
+                    new_recs += 1
+            except Job.DoesNotExist:
+                pass
+                
+        return JsonResponse({
+            'success': True,
+            'message': f"Found {len(matches)} matches, {new_recs} new recommendations saved.",
+            'matches': matches
+        })
+    except Exception as e:
+        logger.error(f"Error in trigger_talent_match_api: {e}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

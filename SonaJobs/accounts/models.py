@@ -58,6 +58,11 @@ class JobSeekerProfile(models.Model):
     desired_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     willing_to_relocate = models.BooleanField(default=False)
     
+    # Auto-matching preferences and rate limiting
+    auto_match_enabled = models.BooleanField(default=True)
+    last_auto_match = models.DateTimeField(null=True, blank=True)
+    auto_match_count_today = models.PositiveIntegerField(default=0)
+    
     def __str__(self):
         return f"{self.user.get_full_name()}'s Profile"
 

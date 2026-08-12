@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/validate/', views.validate_file_api, name='validate_file_api'),
     path('api/analysis/<int:analysis_id>/summary/', views.get_analysis_summary_api, name='get_analysis_summary_api'),
     path('api/analysis/<int:analysis_id>/match-scores/', views.get_match_scores_api, name='get_match_scores_api'),
+    path('api/trigger-match/', views.trigger_talent_match_api, name='trigger_talent_match_api'),
 ] 

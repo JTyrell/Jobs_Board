@@ -17,7 +17,12 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', secrets.token_urlsafe(50)) # noqa: S
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration
-ALLOWED_HOSTS = ['*']  # Railway handles routing
+ALLOWED_HOSTS = []
+render_external_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if render_external_hostname:
+    ALLOWED_HOSTS.append(render_external_hostname)
+elif DEBUG:
+    ALLOWED_HOSTS = ['*']
 
 # Application definition
 

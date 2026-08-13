@@ -18,12 +18,12 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy requirements and install
-COPY SonaJobs/requirements.txt /app/
+COPY requirements.txt /app/
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Copy the entire Django project
-COPY SonaJobs/ /app/
+COPY . /app/
 
 # Generate migrations (these will be baked into the Docker image)
 # Collect static files (baked into the Docker image)

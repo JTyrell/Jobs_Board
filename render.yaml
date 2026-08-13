@@ -2,6 +2,7 @@ services:
   - type: web
     name: sonajobs-web
     env: docker
+    rootDir: SonaJobs
     dockerfilePath: ./Dockerfile
     plan: standard
     healthCheckPath: /
